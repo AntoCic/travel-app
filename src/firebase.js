@@ -4,8 +4,8 @@ import { getAuth, GoogleAuthProvider, createUserWithEmailAndPassword, signInWith
 // Segui il README nella sezione START WITH FIREBASE prima di continuare
 // Sistema la tua public apiKey e authDomain qui sotto
 const firebaseConfig = {
-    apiKey: "AIzaSyAkVg40jIUOiulJ9OtndzkPFp_wgE-Q06M",
-    authDomain: "temp-vue-firebase.firebaseapp.com",
+    apiKey: "AIzaSyCOjgmGVlPgtqsZnoVP5GlmzGotZQ-i2yY",
+    authDomain: "cic-travel-app.firebaseapp.com",
 };
 
 if (firebaseConfig.apiKey === "") {

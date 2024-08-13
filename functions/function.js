@@ -31,7 +31,7 @@ const serviceAccount = {
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
   databaseURL: FIREBASE_DATABASE_URL,
-  storageBucket: "temp-vue-firebase.appspot.com"
+  storageBucket: "cic-travel-app.appspot.com",
 });
 
 const db = admin.database();
