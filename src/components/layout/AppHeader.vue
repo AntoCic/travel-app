@@ -4,9 +4,11 @@
       <nav class="row align-items-center my-1">
         <div class="col">
           <RouterLink to="/">
-            <img src="/img/logo.png" class="logo align-text-top" alt="Vue logo" />
+            <img src="/img/logo.png" class="logo" alt="Vue logo" />
+            <h1 class="d-inline-block align-text-top mb-0 text-blu">TripCicRem</h1>
           </RouterLink>
         </div>
+
         <div class="col-auto">
           <button v-if="store.user.isLogged" @click="store.user.logout"
             class="btn btn-outline-danger border-0 px-1 me-1">
@@ -17,7 +19,7 @@
           </button>
 
           <RouterLink to="/user" v-else>
-            <button class="btn btn-outline-light border-0 px-1 me-1">
+            <button class="btn btn-outline-dark border-0 px-1 me-1">
               <span class="material-symbols-outlined">
                 account_circle
               </span>

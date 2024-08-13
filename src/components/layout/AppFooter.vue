@@ -2,7 +2,7 @@
   <footer class="py-3">
 
     <div class="container">
-      <div class="row align-items-center text-white">
+      <div class="row align-items-center text-blu">
         <div class="col">
           <p class="mb-0">Antonino Cicala &copy;2024.</p>
         </div>

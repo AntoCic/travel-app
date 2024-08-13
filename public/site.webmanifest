@@ -1,6 +1,6 @@
 {
-    "short_name": "TEMP",
-    "name": "Template",
+    "short_name": "TripCicRem",
+    "name": "TripCicRem",
     "icons": [
         {
             "src": "/img/logo.png",
@@ -8,6 +8,6 @@
             "sizes": "192x192"
         }
     ],
-    "theme_color": "#212529",
+    "theme_color": "#EBEBD3",
     "display": "fullscreen"
 }

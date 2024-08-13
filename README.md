@@ -1,3 +1,9 @@
+# TripCicRem
+
+https://coolors.co/083d77-ebebd3-f4d35e-ee964b-f95738
+
+
+
 # Template base Vue, Bootstrap, sass, firebase
 
 ### Guida per Iniziare con Firebase

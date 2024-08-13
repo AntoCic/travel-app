@@ -3,7 +3,7 @@
     <div class="card bg-transparent my-3">
       <div class="row g-0 bg-light bg-opacity-25 border-0 rounded">
         <div class="col-md-8">
-          <div class="card-body text-white">
+          <div class="card-body text-blu">
             <p class="card-text">Nome cognome: {{ name }}</p>
             <p class="card-text">Email: <a :href="'mailto:' + email">{{ email }}</a></p>
             <p class="card-text">Telefono: <a :href="'tel:' + phone">{{ phone }}</a></p>
