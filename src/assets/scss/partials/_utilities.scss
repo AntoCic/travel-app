@@ -1,5 +1,13 @@
 @use './variables' as *;
 
+.text-blu {
+    color: $blue;
+}
+
+.h-ivert:hover {
+    filter: invert(0.5);
+}
+
 .noselect {
     -webkit-touch-callout: none;
     /* iOS Safari */
@@ -30,8 +38,4 @@
     input {
         padding-left: 28px;
     }
-}
-
-.text-blu {
-    color: $blue;
 }

@@ -39,158 +39,157 @@ const bucket = admin.storage().bucket();
 
 exports.handler = async function (event, context) {
   await router.start(event);
+
+  await router.GET('trip-type', async () => {
+    const res = await firebase.public.get(router.pathParams);
+    router.setRes(res);
+  })
+
   // AUTH route
-  const user = await dbFirebase.auth(router.authToken);
-  if (user) {
+  if (router.authToken) {
+    const user = await firebase.auth(router.authToken);
+    if (user) {
+      await router.POST('g', async () => {
+        const names = await firebase.users.get(router.pathParams);
+        router.setRes(names);
+      })
 
-    await router.POST('g', async () => {
-      const names = await dbFirebase.get(router.pathParams);
-      router.setRes(names);
-    })
-
-    await router.POST('a', async () => {
-      let { id, ...data } = router.bodyParams
-      if (data) {
-        const item = await dbFirebase.add(data, router.pathParams, id);
-        router.setRes(item);
-      } else {
-        router.error();
-      }
-    })
-
-    await router.PUT('u', async () => {
-      const { id, ...data } = router.bodyParams
-      if (id && data) {
-        const item = await dbFirebase.update(id, data, router.pathParams);
-        router.setRes(item);
-      } else {
-        router.error();
-      }
-    })
-
-    await router.DELETE('d', async () => {
-      const id = router.bodyParams.id
-      if (id) {
-        const itemDelated = await dbFirebase.delete(id, router.pathParams);
-        router.setRes(itemDelated);
-      }
-    })
-
-
-    // Funzione per caricare un'immagine
-    await router.POST('uploadImage', async () => {
-      const { base64Image, fileName } = router.bodyParams;
-
-      if (!base64Image || !fileName) {
-        return router.error(400, 'Missing base64Image or fileName');
-      }
-
-      try {
-        const buffer = Buffer.from(base64Image, 'base64');
-
-        const extension = fileName.split('.').pop().toLowerCase();
-        let contentType;
-        switch (extension) {
-          case 'jpg':
-          case 'jpeg':
-            contentType = 'image/jpeg';
-            break;
-          case 'png':
-            contentType = 'image/png';
-            break;
-          case 'gif':
-            contentType = 'image/gif';
-            break;
-          case 'svg':
-            contentType = 'image/svg+xml';
-            break;
-          default:
-            return router.error(400, 'Unsupported image format');
+      await router.POST('a', async () => {
+        let { id, ...data } = router.bodyParams
+        if (data) {
+          const item = await firebase.users.add(data, router.pathParams, id);
+          router.setRes(item);
+        } else {
+          router.error();
         }
-        const fullName = `${dbFirebase.newId()}_${fileName}`
+      })
 
-        const file = bucket.file(`users/${dbFirebase.user.uid}/${fullName}`);
-        await file.save(buffer, { contentType });
-        const [url] = await file.getSignedUrl({
-          action: 'read',
-          expires: '03-09-2491',  // Puoi cambiare questa data di scadenza
-        });
+      await router.PUT('u', async () => {
+        const { id, ...data } = router.bodyParams
+        if (id && data) {
+          const item = await firebase.users.update(id, data, router.pathParams);
+          router.setRes(item);
+        } else {
+          router.error();
+        }
+      })
 
-        router.setRes({ [fullName]: url });
-      } catch (error) {
-        router.error(500, 'Failed to upload image');
-      }
-    });
+      await router.DELETE('d', async () => {
+        const id = router.bodyParams.id
+        if (id) {
+          const itemDelated = await firebase.users.delete(id, router.pathParams);
+          router.setRes(itemDelated);
+        }
+      })
 
-    // Funzione per ottenere le immagini dell'utente
-    await router.POST('getImages', async () => {
-      try {
-        const [files] = await bucket.getFiles({ prefix: `users/${dbFirebase.user.uid}/` });
-        const urls = {};
 
-        await Promise.all(files.map(async file => {
+      // Funzione per caricare un'immagine
+      await router.POST('uploadImage', async () => {
+        const { base64Image, fileName } = router.bodyParams;
+
+        if (!base64Image || !fileName) {
+          return router.error(400, 'Missing base64Image or fileName');
+        }
+
+        try {
+          const buffer = Buffer.from(base64Image, 'base64');
+
+          const extension = fileName.split('.').pop().toLowerCase();
+          let contentType;
+          switch (extension) {
+            case 'jpg':
+            case 'jpeg':
+              contentType = 'image/jpeg';
+              break;
+            case 'png':
+              contentType = 'image/png';
+              break;
+            case 'gif':
+              contentType = 'image/gif';
+              break;
+            case 'svg':
+              contentType = 'image/svg+xml';
+              break;
+            default:
+              return router.error(400, 'Unsupported image format');
+          }
+          const fullName = `${firebase.newId()}_${fileName}`
+
+          const file = bucket.file(`users/${firebase.user.uid}/${fullName}`);
+          await file.save(buffer, { contentType });
           const [url] = await file.getSignedUrl({
             action: 'read',
             expires: '03-09-2491',  // Puoi cambiare questa data di scadenza
           });
 
-          const fileName = file.name.split('/')
-          while (fileName.length > 1) {
-            fileName.shift();
-          }
-
-          urls[fileName] = url;
-        }));
-
-        router.setRes({ urls });
-      } catch (error) {
-        router.error(500, 'Failed to retrieve images');
-      }
-    });
-
-    // Route per eliminare l'immagine
-    await router.POST('deleteImage', async () => {
-      const { fileName } = router.bodyParams;
-
-      if (fileName) {
-        const fullPath = `users/${dbFirebase.user.uid}/${fileName}`;
-        try {
-          await bucket.file(fullPath).delete();
-          console.log(fileName);
-
-          router.setRes({ deleted: fileName });
+          router.setRes({ [fullName]: url });
         } catch (error) {
-          console.error('Failed to delete image:', error);
-          router.error(500, 'Failed to delete image');
+          router.error(500, 'Failed to upload image');
         }
-      } else {
-        router.error(400, 'Image URL not provided');
-      }
-    });
+      });
 
+      // Funzione per ottenere le immagini dell'utente
+      await router.POST('getImages', async () => {
+        try {
+          const [files] = await bucket.getFiles({ prefix: `users/${firebase.user.uid}/` });
+
+          let expires = new Date();
+          expires.setDate(expires.getDate() + 1);
+          expires = expires.toISOString();
+
+          const urls = {};
+          await Promise.all(files.map(async file => {
+            const [url] = await file.getSignedUrl({
+              action: 'read',
+              expires,
+            });
+
+            const fileName = file.name.split('/')
+            while (fileName.length > 1) {
+              fileName.shift();
+            }
+
+            urls[fileName] = url;
+          }));
+
+          router.setRes({ urls });
+        } catch (error) {
+          router.error(500, 'Failed to retrieve images');
+        }
+      });
+
+      // Route per eliminare l'immagine
+      await router.POST('deleteImage', async () => {
+        const { fileName } = router.bodyParams;
+
+        if (fileName) {
+          const fullPath = `users/${firebase.user.uid}/${fileName}`;
+          try {
+            await bucket.file(fullPath).delete();
+            console.log(fileName);
+
+            router.setRes({ deleted: fileName });
+          } catch (error) {
+            console.error('Failed to delete image:', error);
+            router.error(500, 'Failed to delete image');
+          }
+        } else {
+          router.error(400, 'Image URL not provided');
+        }
+      });
+
+    }
   }
   return router.sendRes()
 
 };
 
-const dbFirebase = {
-  idIndex: 0,
-  dbName: 'users',
-  user: null,
-  async auth(idToken) {
-    this.user = null;
-    if (!this.idIndex) {
-      this.idIndex = Math.floor(Math.random() * 100);
-    }
-    try {
-      const decodedToken = await admin.auth().verifyIdToken(idToken);
-      this.user = await admin.auth().getUser(decodedToken.uid);
-      return this.user
-    } catch (error) {
-      router.error(401, error = 'Unauthorized')
-      return null
-    }
-  },
+class Firebase {
+  constructor(dbName, userUid = null) {
+    this.dbName = dbName;
+    this.userUid = userUid;
+  }
+
   async get(pathParams = []) {
     let dbPath = '';
     if (pathParams.length >= 2) {
@@ -199,9 +198,16 @@ const dbFirebase = {
       }
     }
 
-    const snapshot = await db.ref(`${this.dbName}/${this.user.uid + dbPath}`).once('value');
+    let snapshot;
+    if (this.userUid !== null) {
+      snapshot = await db.ref(`${this.dbName}/${this.userUid + dbPath}`).once('value');
+    } else {
+      snapshot = await db.ref(this.dbName + dbPath).once('value');
+    }
+
     return snapshot.val() || {};
-  },
+  }
+
   async add(data, pathParams = [], id = false) {
     let dbPath = '';
     if (pathParams.length >= 2) {
@@ -211,18 +217,24 @@ const dbFirebase = {
     }
     let newId;
     if (id === true) {
-      newId = '/' + this.newId();
+      newId = '/' + firebase.newId();
     } else if (id === false) {
       newId = ''
     } else {
       newId = '/' + id
     }
-    await db.ref(`${this.dbName}/${this.user.uid + dbPath + newId}`).set(data);
+
+    if (this.userUid !== null) {
+      await db.ref(`${this.dbName}/${this.userUid + dbPath + newId}`).set(data);
+    } else {
+      await db.ref(this.dbName + dbPath + newId).set(data);
+    }
+
     if (newId !== '') {
       return { [newId.substring(1)]: data };
     }
     return data;
-  },
+  }
 
   async update(id, data, pathParams = []) {
     let dbPath = '';
@@ -231,9 +243,15 @@ const dbFirebase = {
         dbPath += '/' + pathParams[index];
       }
     }
-    await db.ref(`${this.dbName}/${this.user.uid + dbPath}`).update({ [id]: data });
+
+    if (this.userUid !== null) {
+      await db.ref(`${this.dbName}/${this.userUid + dbPath}`).update({ [id]: data });
+    } else {
+      await db.ref(this.dbName + dbPath).update({ [id]: data });
+    }
+
     return { [id]: data };
-  },
+  }
 
   async delete(id, pathParams = []) {
     let dbPath = '';
@@ -243,8 +261,40 @@ const dbFirebase = {
       }
     }
 
-    await db.ref(`${this.dbName}/${this.user.uid + dbPath}/${id}`).remove();
+    if (this.userUid !== null) {
+      await db.ref(`${this.dbName}/${this.userUid + dbPath}/${id}`).remove();
+    } else {
+      await db.ref(`${this.dbName + dbPath}/${id}`).remove();
+    }
+
     return { deleted: id };
+  }
+
+}
+
+const firebase = {
+  idIndex: 0,
+  dbName: 'users',
+  user: null,
+
+  public: new Firebase("public"),
+  users: null,
+
+
+  async auth(idToken) {
+    this.user = null;
+    if (!this.idIndex) {
+      this.idIndex = Math.floor(Math.random() * 100);
+    }
+    try {
+      const decodedToken = await admin.auth().verifyIdToken(idToken);
+      this.user = await admin.auth().getUser(decodedToken.uid);
+      this.users = new Firebase("users", this.user.uid)
+      return this.user
+    } catch (error) {
+      router.error(401, error = 'Unauthorized')
+      return null
+    }
   },
   newId() {
     let newId = this.idIndex.toString(36)
@@ -254,8 +304,6 @@ const dbFirebase = {
     return newId;
   }
 }
-
-
 
 // Oggetto che ho creato per gestire e semplificare le chiamate al server
 const router = {

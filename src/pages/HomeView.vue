@@ -1,5 +1,37 @@
 <template>
-  <div class="container my-auto">
+  <div class="container">
+
+    <div class="row">
+      jambo
+    </div>
+
+    <div class="row">
+      <div class="col-auto ms-auto">
+        <span>add new trip</span>
+        <RouterLink :to="{ name: 'trip.create' }">
+          <button class="btn btn-outline-success p-1 rounded-circle border-0">
+            <span class="material-symbols-outlined d-block">
+              add_circle
+            </span>
+          </button>
+        </RouterLink>
+
+      </div>
+    </div>
+
+    <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4">
+      <div class="col p-1" v-for="x in 10">
+        <div class="card h-100 shadow">
+          <img src="..." class="card-img-top" alt="...">
+          <div class="card-body  pb-0">
+            <h5 class="card-title mb-0">Name</h5>
+            <p class="card-text mb-0 text-end"><small>data</small></p>
+            <p class="card-text mb-0"><small class="text-body-secondary">Tap for details.</small></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="row">
 
       <div class="col-12 col-md-8 mx-auto">

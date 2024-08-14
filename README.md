@@ -29,14 +29,21 @@ Questa guida ti aiuterà a configurare Firebase nel tuo progetto, includendo la 
 ```json
 {
   "rules": {
-    ".read": "auth != null",
-    ".write": "auth != null",
+    "public": {
+      ".read": "true",
+        // cambiare specificUserId con id admin
+      ".write": "auth != null && auth.uid === 'specificUserId'"
+    },
+    
     "users": {
       "$userId": {
         ".read": "$userId === auth.uid",
         ".write": "$userId === auth.uid"
       }
-    }
+    },
+    
+    ".read": "false",
+    ".write": "false"
   }
 }
 ```
@@ -57,9 +64,16 @@ rules_version = '2';
 
 service firebase.storage {
   match /b/{bucket}/o {
-    match /users/{allPaths=**} {
+    match /users/{userId}/{allPaths=**} {
       allow read, write: if request.auth != null && request.auth.uid == userId;
     }
+
+   match /public/{allPaths=**} {
+      allow read: if true;
+      // cambiare specificUserId con id admin
+      allow write: if request.auth != null && request.auth.uid == 'specificUserId';
+    }
+
     match /{allPaths=**} {
       allow read, write: if false;
     }

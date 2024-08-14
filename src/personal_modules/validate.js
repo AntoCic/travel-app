@@ -8,7 +8,7 @@ export default {
     },
 
     check(request) {
-        const { type, query, required, form, ...varTocheck } = request;
+        let { type, query, required, form, ...varTocheck } = request;
         if (!form) {
             form = ''
         }
@@ -53,6 +53,14 @@ export default {
 
                     case 'retype-password':
                         this.VL_retypePassword(form, value, varName, query);
+                        break;
+
+                    case 'date':
+                        this.VL_date(form, value, varName)
+                        break;
+
+                    case 'end-date':
+                        this.VL_endDate(form, value, varName, query)
                         break;
 
                     default:
@@ -108,7 +116,7 @@ export default {
             min = query[0] || min;
             max = query[1] || max;
         }
-
+        value
         if (
             value.length <= max &&
             value.length >= min
@@ -233,4 +241,41 @@ export default {
 
     },
 
+    VL_date(form, value, varName) {
+        const regexData = /^(\d{4})-(\d{2})-(\d{2})$/;
+        if (value.length) {
+            if (regexData.test(value)) {
+                this.VL[form][varName] = true
+            } else {
+                this.VL[form][varName] = false;
+            }
+        } else {
+            if (this.VL[form][varName] !== null) {
+                this.VL[form][varName] = false;
+            }
+        }
+    },
+
+    VL_endDate(form, value, varName, query) {
+        const regexData = /^(\d{4})-(\d{2})-(\d{2})$/;
+        if (value.length) {
+            if (regexData.test(value) &&
+                regexData.test(query) &&
+                new Date(query) <= new Date(value)
+            ) {
+                this.VL[form][varName] = true;
+            } else {
+                this.VL[form][varName] = false;
+            }
+        } else {
+            if (this.VL[form][varName] !== null) {
+                this.VL[form][varName] = false;
+            }
+        }
+    },
 }
+
+// <p :class="validate.showError('title')"> Il campo deve contenere un minimo di 3 caratteri e un massimo di 100. </p>
+
+// <p :class="validate.showError('endDate')"> Compila entrambe le date. La data di inizio deve essere antecedente alla data di fine. </p>
+

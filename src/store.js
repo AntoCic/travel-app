@@ -7,12 +7,41 @@ export const store = reactive({
     start() {
         this.user.checkLogged()
         console.log('-START-');
+        this.trip.getTypes();
     },
 
     onLogin() {
         console.log('-Is logeed-');
         store.firebase.loadImg();
         this.firebase.db_get();
+    },
+
+    trip: {
+        types: null,
+
+        async getTypes() {
+            this.types = null
+            store.loading.on();
+            return await axios.get('/api/trip-type/tripTypes', {}, {
+                headers: {
+                    "Authorization": store.user.idToken
+                }
+            })
+                .then((res) => {
+                    store.loading.off();
+                    if (res.data) {
+                        this.types = res.data
+                    }
+                    return true
+                })
+                .catch((error) => {
+                    console.error(error)
+                    store.loading.off();
+                    return false
+                })
+        }
+
+
     },
 
     user: {
@@ -169,6 +198,27 @@ export const store = reactive({
     firebase: {
         items: {},
         images: {},
+        storageBucket: 'cic-travel-app.appspot.com',
+
+        getImgUrl(path) {
+
+            if (path) {
+                // Rimuove il primo carattere se è '/'
+                if (path[0] === '/') {
+                    path = path.slice(1);
+                }
+
+                // Rimuove l'ultimo carattere se è '/'
+                if (path[path.length - 1] === '/') {
+                    path = path.slice(0, -1);
+                }
+
+                // Sostituisce tutti i '/' rimanenti con '%2F'
+                path = path.replace(/\//g, '%2F');
+            }
+
+            return `https://firebasestorage.googleapis.com/v0/b/${this.storageBucket}/o/public%2F${path}?alt=media`
+        },
 
         async db_get() {
             this.items = {}
