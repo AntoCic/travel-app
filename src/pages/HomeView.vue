@@ -22,7 +22,8 @@
     <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4">
       <div class="col p-1" v-for="x in 10">
         <div class="card h-100 shadow">
-          <img src="..." class="card-img-top" alt="...">
+          <img src="https://raw.githubusercontent.com/AntoCic/test_Tecnico_Deploy/main/logo.png" class="card-img-top"
+            alt="cover travel">
           <div class="card-body  pb-0">
             <h5 class="card-title mb-0">Name</h5>
             <p class="card-text mb-0 text-end"><small>data</small></p>
