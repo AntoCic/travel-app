@@ -171,7 +171,6 @@ export default {
   methods: {
     async login() {
       const isRegistered = await store.user.login(this.email, this.password);
-
       if (isRegistered) {
         this.email = '';
         this.password = '';

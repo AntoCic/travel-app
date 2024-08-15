@@ -1,13 +1,20 @@
 import { reactive } from 'vue'
 import axios from 'axios'
 import { auth, provider, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup, signOut, onAuthStateChanged, sendPasswordResetEmail } from './firebase';
-
+import Stage from './models/Stage.js'
 export const store = reactive({
 
     start() {
         this.user.checkLogged()
         console.log('-START-');
         this.trip.getTypes();
+
+
+        const stage = new Stage();
+
+
+        console.log(stage);
+
     },
 
     onLogin() {

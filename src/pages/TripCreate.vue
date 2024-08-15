@@ -9,8 +9,8 @@
           <h5>Seleziona un tipo di viaggio</h5>
           <div class="carousel slide">
             <div class="carousel-indicators">
-              <button v-for="(_type, key, index) in store.trip.types" :key="key + 'tbtn'" type="button"
-                :data-bs-target="addTypeTrip(index, key)" @click="nextTypeTrip(key)"
+              <button v-for="(_type, key, index) in store.trip.types" :key="fillTripTypeIndex(index, key) + 'tbtn'"
+                type="button" data-bs-target="" @click="nextTypeTrip(key)"
                 :class="index === tripTypeIndex[tripType] ? 'active' : ''"></button>
             </div>
             <div class="carousel-inner">
@@ -82,7 +82,7 @@
       </div>
 
       <div class="col-12">
-        <button class="btn btn-outline-success w-100" @click="">ADD TRIP</button>
+        <button class="btn btn-outline-success w-100" @click="onSubmitTrip">ADD TRIP</button>
       </div>
     </div>
   </div>
@@ -105,7 +105,7 @@ export default {
     }
   },
   methods: {
-    addTypeTrip(index, key) {
+    fillTripTypeIndex(index, key) {
       if (this.tripTypeIndex === null) {
         this.tripTypeIndex = {}
         this.tripTypeIndex[key] = index
@@ -121,30 +121,51 @@ export default {
       if (key !== null) {
         this.tripType = key
       } else {
-        const keys = Object.keys(this.tripTypeIndex);
-
-        for (let xkey of keys) {
-          if (this.tripTypeIndex[xkey] === this.tripTypeIndex[this.tripType] + 1) {
-            this.tripType = xkey
-            return true
-          }
-        }
-        this.tripType = keys[0]
-        return false
+        const nextIndex = this.tripTypeIndex[this.tripType] + 1;
+        let firstKey;
+        const nextType = Object.entries(this.tripTypeIndex).find(([_key, i]) => {
+          if (!firstKey) { firstKey = _key }
+          return i === nextIndex
+        });
+        this.tripType = nextType ? nextType[0] : firstKey;
       }
     },
     prevTypeTrip() {
-      const keys = Object.keys(this.tripTypeIndex);
-      if (this.tripTypeIndex[this.tripType] > 0) {
-        for (let key of keys) {
-          if (this.tripTypeIndex[key] === this.tripTypeIndex[this.tripType] - 1) {
-            this.tripType = key
-            return
-          }
-        }
-      }
-      this.tripType = keys[keys.length - 1]
+
+      const nextIndex = this.tripTypeIndex[this.tripType] - 1;
+      let lastKey;
+      const nextType = Object.entries(this.tripTypeIndex).find(([_key, i]) => {
+        lastKey = _key
+        return i === nextIndex
+      });
+      this.tripType = nextType ? nextType[0] : lastKey;
     },
+
+    onSubmitTrip() {
+      if (this.validate.isAllValidated()) {
+        // const isRegistered = await store.user.register(this.registerUserName, this.registerEmail, this.registerPassword);
+        console.log(
+          this.title,
+          this.description,
+          this.startDate,
+          this.endDate,
+          this.tripType,
+        );
+
+        this.resetForm()
+
+      } else {
+        alert('Per favore, completa tutti i campi correttamente.');
+      }
+    },
+    resetForm() {
+      this.title = '';
+      this.description = '';
+      this.startDate = '';
+      this.endDate = '';
+      this.tripType = Object.entries(this.tripTypeIndex)[0][0];
+      this.validate.init()
+    }
   },
   created() {
     this.validate.init()
