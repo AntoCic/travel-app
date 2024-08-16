@@ -141,23 +141,30 @@ export default {
       this.tripType = nextType ? nextType[0] : lastKey;
     },
 
-    onSubmitTrip() {
+    async onSubmitTrip() {
       if (this.validate.isAllValidated()) {
-        // const isRegistered = await store.user.register(this.registerUserName, this.registerEmail, this.registerPassword);
-        console.log(
-          this.title,
-          this.description,
-          this.startDate,
-          this.endDate,
-          this.tripType,
-        );
-
-        this.resetForm()
-
+        const newTrip = await this.store.trip.add(this.sendObj(["title", "description", "startDate", "endDate", "tripType"]))
+        if (newTrip) {
+          this.resetForm()
+          this.$router.push({ name: 'home' });
+        } else {
+          alert('Errore onSubmitTrip contattare assistenza');
+        }
       } else {
         alert('Per favore, completa tutti i campi correttamente.');
       }
     },
+
+    sendObj(arrVarName) {
+      const obj = {};
+      arrVarName.forEach((name) => {
+        if (this[name] !== undefined) {
+          obj[name] = this[name];
+        }
+      });
+      return obj
+    },
+
     resetForm() {
       this.title = '';
       this.description = '';

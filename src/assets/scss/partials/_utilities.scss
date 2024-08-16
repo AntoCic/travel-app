@@ -4,6 +4,26 @@
     color: $blue;
 }
 
+.text-cream {
+    color: $cream;
+}
+
+.text-yellow {
+    color: $yellow;
+}
+
+.text-orange-l {
+    color: $orange-l;
+}
+
+.text-orange {
+    color: $orange;
+}
+
+.text-shadow {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
+  }
+
 .h-ivert:hover {
     filter: invert(0.5);
 }

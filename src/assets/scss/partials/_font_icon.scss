@@ -19,3 +19,30 @@
 .f-Audiowide {
   font-family: Audiowide;
 }
+
+@font-face {
+  font-family: PermanentMarker;
+  src: url('/fonts/Permanent_Marker/PermanentMarker-Regular.ttf');
+}
+
+.f-PermanentMarker {
+  font-family: PermanentMarker;
+}
+
+@font-face {
+  font-family: Quicksand;
+  src: url('/fonts/Quicksand/Quicksand-VariableFont_wght.ttf');
+}
+
+.f-Quicksand {
+  font-family: Quicksand;
+}
+
+// @font-face {
+//   font-family: Quicksand;
+//   src: url('../../../../public/fonts/Quicksand/Quicksand-VariableFont_wght.ttf');
+// }
+
+// .f-Quicksand {
+//   font-family: Quicksand;
+// }

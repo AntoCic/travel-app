@@ -2,12 +2,18 @@
   <div class="container">
 
     <div class="row">
-      jambo
+      <div class="col position-relative">
+        <img src="../assets/img/hero.png" class="w-100" alt="">
+        <h4
+          class="text-end position-absolute top-50 end-0 translate-middle-y me-4 f-PermanentMarker text-blu text-shadow">
+          Esplora. Scopri. Vivi.<br>La tua
+          avventura inizia qui.</h4>
+      </div>
     </div>
 
     <div class="row">
       <div class="col-auto ms-auto">
-        <span>add new trip</span>
+        <span class="me-1">Inizia un nuovo viaggio</span>
         <RouterLink :to="{ name: 'trip.create' }">
           <button class="btn btn-outline-success p-1 rounded-circle border-0">
             <span class="material-symbols-outlined d-block">
@@ -19,18 +25,19 @@
       </div>
     </div>
 
-    <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4">
-      <div class="col p-1" v-for="x in 10">
+    <div v-if="store.trip.all" class="row row-cols-2 row-cols-md-3 row-cols-lg-4 mb-3">
+      <RouterLink :to="{ name: 'trip.show', params: { id: key } }" class="col p-1" v-for="(trip, key) in store.trip.all"
+        :key="key">
         <div class="card h-100 shadow">
-          <img src="https://raw.githubusercontent.com/AntoCic/test_Tecnico_Deploy/main/logo.png" class="card-img-top"
+          <img :src="store.firebase.getImgUrl(store.trip.types[trip.tripType].url_img)" class="card-img-top"
             alt="cover travel">
           <div class="card-body  pb-0">
-            <h5 class="card-title mb-0">Name</h5>
-            <p class="card-text mb-0 text-end"><small>data</small></p>
+            <h5 class="card-title mb-0">{{ trip.title }}</h5>
+            <p class="card-text mb-0 text-end"><small>{{ trip.startDate }} - {{ trip.endDate }}</small></p>
             <p class="card-text mb-0"><small class="text-body-secondary">Tap for details.</small></p>
           </div>
         </div>
-      </div>
+      </RouterLink>
     </div>
 
     <div class="row">
@@ -42,23 +49,7 @@
             <img src="../assets/img/box.svg" alt="icona di un box di legno">
           </span>
 
-          <div class="mb-3 text-center">
-            <CmpDropFile @getImg="store.firebase.uploadImg" fileType="img" />
-          </div>
-
-          <!-- Display uploaded images -->
-          <div v-if="store.firebase.images" class="mb-3 text-center">
-            <div v-for="(image, index) in store.firebase.images" :key="index"
-              class="m-2 d-inline-block position-relative">
-              <img :src="image" alt="Uploaded Image" class="d-inline-block" width="150" />
-              <span type="button" @click="store.firebase.deleteImg(index)"
-                class="position-absolute top-0 start-100 translate-middle btn btn-outline-danger p-0 rounded-circle d-flex justify-content-center align-items-center"
-                style="width: 25px; aspect-ratio: 1/1;">
-                x
-                <span class="visually-hidden">Delete image</span>
-              </span>
-            </div>
-          </div>
+          
 
           <!-- Existing items section -->
           <div class="input-group mb-3">
@@ -105,7 +96,7 @@ export default {
     },
 
   },
-  created() {
+  mounted() {
   }
 }
 </script>

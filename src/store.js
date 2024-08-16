@@ -2,6 +2,7 @@ import { reactive } from 'vue'
 import axios from 'axios'
 import { auth, provider, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup, signOut, onAuthStateChanged, sendPasswordResetEmail } from './firebase';
 import Stage from './models/Stage.js'
+import Trip from './models/Trip.js';
 export const store = reactive({
 
     start() {
@@ -9,11 +10,9 @@ export const store = reactive({
         console.log('-START-');
         this.trip.getTypes();
 
+        // const stage = new Stage();
+        // console.log(stage);
 
-        const stage = new Stage();
-
-
-        console.log(stage);
 
     },
 
@@ -21,10 +20,27 @@ export const store = reactive({
         console.log('-Is logeed-');
         store.firebase.loadImg();
         this.firebase.db_get();
+        this.trip.get();
+        // const trip = new Trip();
     },
 
     trip: {
         types: null,
+        all: null,
+
+
+        async get() {
+            this.all = await Trip.get()
+            return this.all
+        },
+
+        async add(trip) {
+            let newTrip = new Trip(trip);
+            newTrip = await newTrip.save()
+            const key = Object.keys(newTrip)[0];
+            this.all[key] = newTrip[key];
+            return newTrip
+        },
 
         async getTypes() {
             this.types = null
