@@ -83,10 +83,59 @@ exports.handler = async function (event, context) {
       })
 
 
+      // Funzione per ottenere le immagini dell'utente
+      await router.POST('getImages', async () => {
+        const { fileNames } = router.bodyParams;
+
+
+        let dbPath = '';
+        if (router.pathParams.length >= 2) {
+          for (let index = 1; index < router.pathParams.length; index++) {
+            dbPath += '/' + router.pathParams[index];
+          }
+        }
+        try {
+          const [files] = await bucket.getFiles({ prefix: `users/${firebase.user.uid + dbPath}` });
+
+          const urls = {};
+          await Promise.all(files.map(async file => {
+
+            let fileName = file.name.split('/')
+            while (fileName.length > 1) {
+              fileName.shift();
+            }
+            fileName = fileName[0]
+            
+            if (fileNames.includes(fileName)) {
+
+              let expires = new Date();
+              expires.setDate(expires.getDate() + 1);
+              expires = expires.toISOString();
+
+              const [url] = await file.getSignedUrl({
+                action: 'read',
+                expires,
+              });
+              urls[fileName] = url;
+            }
+          }));
+
+          router.setRes({ urls });
+        } catch (error) {
+          router.error(500, 'Failed to retrieve images');
+        }
+      });
+
+
       // Funzione per caricare un'immagine
       await router.POST('uploadImage', async () => {
         const { base64Image, fileName } = router.bodyParams;
-
+        let dbPath = '';
+        if (router.pathParams.length >= 2) {
+          for (let index = 1; index < router.pathParams.length; index++) {
+            dbPath += '/' + router.pathParams[index];
+          }
+        }
         if (!base64Image || !fileName) {
           return router.error(400, 'Missing base64Image or fileName');
         }
@@ -115,7 +164,7 @@ exports.handler = async function (event, context) {
           }
           const fullName = `${firebase.newId()}_${fileName}`
 
-          const file = bucket.file(`users/${firebase.user.uid}/${fullName}`);
+          const file = bucket.file(`users/${firebase.user.uid + dbPath}/${fullName}`);
           await file.save(buffer, { contentType });
           const [url] = await file.getSignedUrl({
             action: 'read',
@@ -125,36 +174,6 @@ exports.handler = async function (event, context) {
           router.setRes({ [fullName]: url });
         } catch (error) {
           router.error(500, 'Failed to upload image');
-        }
-      });
-
-      // Funzione per ottenere le immagini dell'utente
-      await router.POST('getImages', async () => {
-        try {
-          const [files] = await bucket.getFiles({ prefix: `users/${firebase.user.uid}/` });
-
-          let expires = new Date();
-          expires.setDate(expires.getDate() + 1);
-          expires = expires.toISOString();
-
-          const urls = {};
-          await Promise.all(files.map(async file => {
-            const [url] = await file.getSignedUrl({
-              action: 'read',
-              expires,
-            });
-
-            const fileName = file.name.split('/')
-            while (fileName.length > 1) {
-              fileName.shift();
-            }
-
-            urls[fileName] = url;
-          }));
-
-          router.setRes({ urls });
-        } catch (error) {
-          router.error(500, 'Failed to retrieve images');
         }
       });
 

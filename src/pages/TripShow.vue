@@ -1,6 +1,6 @@
 <template>
-  <div class="container">
-    <div v-if="trip" class="row">
+  <div class="container" v-if="trip">
+    <div class="row">
       <div class="col-12">
         <h1 class="text-center">{{ store.trip.types[trip.tripType].title_EN }}</h1>
       </div>
@@ -22,15 +22,31 @@
       </div>
     </div>
     <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4">
-      <RouterLink :to="{ name: 'stage.create', params: { id, date: key } }" class="col p-2"
-        v-for="(day, key) in trip.day" :key="key">
+      <!-- <RouterLink :to="{ name: 'stage.create', params: { id, date: key } }" class="col p-2" -->
+      <div class="col p-2" v-for="(day, key) in trip.day" :key="key">
         <div class="border rounded p-2 pt-3 position-relative">
           <span class="position-absolute top-0 start-0 translate-middle-y badge rounded bg-light text-orange-l">
             {{ key }}
           </span>
-          <p class="mb-0">Ancora nessuna attivita per {{ day.date }}</p>
+          <span class="position-absolute top-0 end-0 translate-middle-y">
+            <RouterLink :to="{ name: 'stage.create', params: { id, date: key } }" type="button"
+              class="btn btn-outline-success p-1 rounded-circle border-0">
+              <span class="material-symbols-outlined d-block">
+                add_circle
+              </span>
+            </RouterLink>
+          </span>
+          <template v-if="Object.keys(day).length > 0">
+            <p v-for="(stage, stageid) in day" :key="stageid" class="mb-0">
+              <RouterLink :to="{ name: 'stage.show', params: { id, date: key, stageid } }">
+                {{ stage.name }}
+              </RouterLink>
+            </p>
+          </template>
+          <p v-else class="mb-0">Ancora nessuna attivita per {{ key }}</p>
+
         </div>
-      </RouterLink>
+      </div>
     </div>
   </div>
 </template>
@@ -59,6 +75,7 @@ export default {
     }
   },
   methods: {
+
   },
   computed: {
     trip() {
@@ -71,8 +88,6 @@ export default {
   },
   created() {
     this.validate.init()
-    console.log(this.trip);
-
   }
 }
 </script>

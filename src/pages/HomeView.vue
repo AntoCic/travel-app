@@ -4,10 +4,10 @@
     <div class="row">
       <div class="col position-relative">
         <img src="../assets/img/hero.png" class="w-100" alt="">
-        <h4
-          class="text-end position-absolute top-50 end-0 translate-middle-y me-4 f-PermanentMarker text-blu text-shadow">
-          Esplora. Scopri. Vivi.<br>La tua
-          avventura inizia qui.</h4>
+        <h4 class="text-end position-absolute bottom-0 end-0 fs-6 codystar-regular text-cream text-shadow">
+          Esplora. Scopri. Vivi.<br>La tua avventura inizia qui.
+          <span class="overlay"></span>
+        </h4>
       </div>
     </div>
 
@@ -49,7 +49,7 @@
             <img src="../assets/img/box.svg" alt="icona di un box di legno">
           </span>
 
-          
+
 
           <!-- Existing items section -->
           <div class="input-group mb-3">
@@ -102,6 +102,34 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.codystar-regular {
+  font-family: "Codystar", sans-serif;
+  font-weight: 500;
+  font-style: normal;
+}
+
+h4 {
+  z-index: 1;
+  padding: 8px;
+  padding-top: 20px;
+  padding-left: 20px;
+  margin-bottom: 0px;
+  margin-right: 12px;
+}
+
+.overlay {
+  background: #083D77;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  opacity: 0.75;
+  border-radius: 70% 20% 0 10%;
+}
+
+
 .logo {
   display: inline-block;
   width: 100%;

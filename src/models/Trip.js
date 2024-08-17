@@ -2,29 +2,26 @@ import axios from "axios";
 import { store } from "../store";
 export default class Trip {
     constructor(trip = {}) {
-        const defaults = {
+        const required = {
             title: null,
-            description: null,
             startDate: null,
             endDate: null,
             tripType: null,
-            day: {}
         };
 
-        Object.assign(this, defaults, trip);
+        const optional = {
+            description: '',
+            day: {},
+        };
 
-        !this.title ? console.error('non hai settato title') : false;
-        !this.tripType ? console.error('non hai settato tripType') : false;
-        if (this.startDate && this.endDate) {
+        for (const key in { ...required, ...optional }) {
+            this[key] = trip[key] ?? required[key] ?? optional[key];
+        }
 
-            const start = new Date(this.startDate);
-            const end = new Date(this.endDate);
-            for (let d = start; d <= end; d.setDate(d.getDate() + 1)) {
-                this.day[d.toISOString().split('T')[0]] = { date: d.toDateString() };
+        for (const key in required) {
+            if (this[key] == null) {  // Controlla se è null o undefined
+                throw new Error(`Il campo ${key} è obbligatorio e non può essere nullo o indefinito.`);
             }
-
-        } else {
-            console.error('non hai settato startDate and endDate')
         }
     }
 
@@ -34,7 +31,31 @@ export default class Trip {
                 "Authorization": store.user.idToken
             }
         })
-            .then((res) => {
+            .then(async (res) => {
+                for (const key in res.data) {
+
+                    if (!res.data[key].day) {
+                        res.data[key].day = {}
+                    }
+                    const start = new Date(res.data[key].startDate);
+                    const end = new Date(res.data[key].endDate);
+                    for (let d = start; d <= end; d.setDate(d.getDate() + 1)) {
+                        const newDay = d.toISOString().split('T')[0]
+                        if (!res.data[key].day[newDay]) {
+                            res.data[key].day[newDay] = {};
+                        } else {
+                            const stages = res.data[key].day[newDay]
+                            for (const stageKey in stages) {
+                                if (stages[stageKey].images) {
+                                    res.data[key].day[newDay][stageKey].images = await store.firebase.loadImg(stages[stageKey].images, `/${key}/${newDay}`)
+                                }
+                            }
+                            
+                        }
+                    }
+                    console.log(res.data[key].day);
+                }
+
                 return res.data
             })
             .catch((error) => {

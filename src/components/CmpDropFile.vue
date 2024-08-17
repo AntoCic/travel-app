@@ -24,6 +24,10 @@ export default {
             type: Boolean,
             default: false
         },
+        path: {
+            type: String,
+            default: ''
+        },
     },
     data() {
         return {
@@ -33,8 +37,8 @@ export default {
         sendFile(e) {
             this.$refs.btnDrop.classList.remove('dragging');
             const files = e.dataTransfer ? e.dataTransfer.files : e.target.files;
-            if (files && files[0]) {
-                this.$emit('getImg', files[0]);
+            if (files) {
+                this.$emit('getImg', files);
             }
         },
         dragover() {

@@ -6,59 +6,54 @@
       </div>
       <!-- name -->
       <div class="col-12 mb-2">
-        <label for="title" class="form-label mb-0 ms-1">Nome attivita</label>
+        <label for="name" class="form-label mb-0 ms-1">Nome attivita</label>
         <div class="input-google-icon">
-          <label for="title" class="material-symbols-outlined icon">
+          <label for="name" class="material-symbols-outlined icon">
             filter_retrolux
           </label>
-          <input type="text" :class="['form-control', validate.check({ title, type: 'string', query: [3, 100] })]"
-            id="title" v-model="title" placeholder="Scrivi il titolo">
+          <input type="text" :class="['form-control', validate.check({ name, type: 'string', query: [3, 100] })]"
+            id="name" v-model="name" placeholder="Scrivi il titolo">
         </div>
-        <p :class="validate.showError('title')"> Il campo deve contenere un minimo di 3 caratteri e un
+        <p :class="validate.showError('name')"> Il campo deve contenere un minimo di 3 caratteri e un
           massimo di 100. </p>
       </div>
       <!-- location -->
       <div class="col-12 mb-2">
-        <label for="title" class="form-label mb-0 ms-1">Location</label>
+        <label for="location" class="form-label mb-0 ms-1">Location</label>
         <div class="input-google-icon">
-          <label for="title" class="material-symbols-outlined icon">
+          <label for="location" class="material-symbols-outlined icon">
             explore
           </label>
-          <input type="text" :class="['form-control', validate.check({ title, type: 'string', query: [3, 100] })]"
-            id="title" v-model="title" placeholder="Scrivi il titolo">
+          <input type="text" :class="['form-control', validate.check({ location, type: 'string', query: [3, 100] })]"
+            id="location" v-model="location" placeholder="Scrivi il titolo">
         </div>
-        <p :class="validate.showError('title')"> Il campo deve contenere un minimo di 3 caratteri e un
+        <p :class="validate.showError('location')"> Il campo deve contenere un minimo di 3 caratteri e un
           massimo di 100. </p>
       </div>
       <!-- startTime -->
       <div class="col-6 mb-2">
         <label for="startTime" class="form-label mb-0 ms-1">Data inizio *</label>
-        <input type="time" :class="['form-control', validate.check({ startTime, type: 'date' })]" id="startTime"
+        <input type="time" :class="['form-control', validate.check({ startTime, type: 'time' })]" id="startTime"
           v-model="startTime">
       </div>
       <!-- endTime -->
       <div class="col-6 mb-2">
         <label for="endTime" class="form-label mb-0 ms-1">Data fine *</label>
-        <input type="time" :class="['form-control', validate.check({ endTime, type: 'end-date', query: startTime })]"
+        <input type="time" :class="['form-control', validate.check({ endTime, type: 'time', query: startTime })]"
           id="endTime" v-model="endTime">
       </div>
 
-      <div class="col-12">
-        <p :class="validate.showError('endTime')"> Compila entrambe le date. La data di inizio deve essere antecedente
-          alla data di fine. </p>
-      </div>
       <!-- images -->
       <div class="col-12 mt-2">
         <div class="text-center">
-          <CmpDropFile @getImg="store.firebase.uploadImg" fileType="img" />
+          <CmpDropFile @getImg="getFileList" fileType="img" :multiple="true" />
         </div>
 
         <!-- Display uploaded images -->
-        <div v-if="store.firebase.images" class="mt-3 text-center">
-          <div v-for="(image, index) in store.firebase.images" :key="index"
-            class="m-2 d-inline-block position-relative">
-            <img :src="image" alt="Uploaded Image" class="d-inline-block" width="150" />
-            <span type="button" @click="store.firebase.deleteImg(index)"
+        <div v-if="imgFiles.length" class="mt-3 text-center">
+          <div v-for="(image, index) in imgFiles" :key="index" class="m-2 d-inline-block position-relative">
+            <img :src="image.url" alt="Uploaded Image" class="d-inline-block" width="150" />
+            <span type="button" @click="imgFiles.splice(index, 1)"
               class="position-absolute top-0 start-100 translate-middle btn btn-outline-danger p-0 rounded-circle d-flex justify-content-center align-items-center"
               style="width: 25px; aspect-ratio: 1/1;">
               x
@@ -75,36 +70,22 @@
 
       <!-- food -->
       <div class="col-12 mb-2">
-        <label for="title" class="form-label mb-0 ms-1">food</label>
+        <label for="food" class="form-label mb-0 ms-1">food</label>
         <div class="input-google-icon">
-          <label for="title" class="material-symbols-outlined icon">
+          <label for="food" class="material-symbols-outlined icon">
             restaurant
           </label>
-          <input type="text" :class="['form-control', validate.check({ title, type: 'string', query: [3, 100] })]"
-            id="title" v-model="title" placeholder="Scrivi il titolo">
+          <input type="text" :class="['form-control']" id="food" v-model="food"
+            placeholder="Scrivi cosa vorresti mangire">
         </div>
-        <p :class="validate.showError('title')"> Il campo deve contenere un minimo di 3 caratteri e un
+        <p :class="validate.showError('food')"> Il campo deve contenere un minimo di 3 caratteri e un
           massimo di 100. </p>
       </div>
       <!-- curiosities -->
       <div class="col-12 mb-2">
-        <label for="description" class="form-label mb-0 ms-1">curiosities</label>
-        <textarea class="form-control" id="description" rows="2" v-model="description"></textarea>
+        <label for="curiosities" class="form-label mb-0 ms-1">curiosities</label>
+        <textarea class="form-control" id="curiosities" rows="2" v-model="curiosities"></textarea>
       </div>
-      <!-- rating -->
-      <div class="col-12 mb-2">
-        <label for="title" class="form-label mb-0 ms-1">rating</label>
-        <div class="input-google-icon">
-          <label for="title" class="material-symbols-outlined icon">
-            star_rate
-          </label>
-          <input type="text" :class="['form-control', validate.check({ title, type: 'string', query: [3, 100] })]"
-            id="title" v-model="title" placeholder="Scrivi il titolo">
-        </div>
-        <p :class="validate.showError('title')"> Il campo deve contenere un minimo di 3 caratteri e un
-          massimo di 100. </p>
-      </div>
-
 
       <div class="col-12">
         <button class="btn btn-outline-success w-100" @click="onSubmitTrip">ADD TRIP</button>
@@ -135,17 +116,58 @@ export default {
     return {
       store,
       validate,
-      title: '',
+      name: 'ddd',
+      location: 'ddd',
+      startTime: '12:15',
+      endTime: '12:17',
+      images: [],
       description: '',
-      startTime: '',
-      endTime: '',
+      food: '',
+      curiosities: '',
+      imgFiles: [],
     }
   },
   methods: {
 
     async onSubmitTrip() {
+      // console.log(this.sendObj([
+      //   "name",
+      //   "location",
+      //   "startTime",
+      //   "endTime",
+      //   "images",
+      //   "description",
+      //   "food",
+      //   "curiosities"
+      // ]));
+
+
+
       if (this.validate.isAllValidated()) {
-        const newTrip = await this.store.trip.add(this.sendObj(["title", "description", "startTime", "endTime"]))
+        let outer = this.sendObj([
+          "name",
+          "location",
+          "startTime",
+          "endTime",
+          "images",
+          "description",
+          "food",
+          "curiosities"
+        ])
+        outer.trip_id = this.id;
+        outer.date = this.date;
+        outer.location = {
+          address: outer.location,
+          lat: 33065114516071,
+          lon: 41528345635181,
+        }
+        if (this.imgFiles.length > 0) {
+          for (const file of this.imgFiles) {
+            outer.images.push(await this.store.firebase.uploadImg(file, `/${this.id}/${this.date}`))
+          }
+        }
+
+        const newTrip = await this.store.stage.add(outer)
         if (newTrip) {
           this.resetForm()
           this.$router.push({ name: 'home' });
@@ -168,11 +190,24 @@ export default {
     },
 
     resetForm() {
-      this.title = '';
-      this.description = '';
+      this.name = '';
+      this.location = '';
       this.startTime = '';
       this.endTime = '';
+      this.images = [];
+      this.description = '';
+      this.food = '';
+      this.curiosities = '';
       this.validate.init()
+    },
+
+    getFileList(files) {
+      for (const file of files) {
+        file.url = URL.createObjectURL(file);
+        this.imgFiles.push(file)
+      }
+      console.log(files)
+      // console.log(this.imageUrls);
     }
   },
   created() {

@@ -18,17 +18,24 @@ export const store = reactive({
 
     onLogin() {
         console.log('-Is logeed-');
-        store.firebase.loadImg();
         this.firebase.db_get();
         this.trip.get();
-        // const trip = new Trip();
+    },
+
+    stage: {
+        all: {},
+        async add(stage) {
+            let newStage = new Stage(stage);
+            newStage = await newStage.save()
+            const key = Object.keys(newStage)[0];
+            this.all[key] = newStage[key];
+            return newStage
+        },
     },
 
     trip: {
         types: null,
-        all: null,
-
-
+        all: {},
         async get() {
             this.all = await Trip.get()
             return this.all
@@ -62,9 +69,7 @@ export const store = reactive({
                     store.loading.off();
                     return false
                 })
-        }
-
-
+        },
     },
 
     user: {
@@ -336,16 +341,17 @@ export const store = reactive({
                 })
         },
 
-        loadImg() {
+        async loadImg(fileNames, path = '') {
             store.loading.on();
-            axios.post('/api/getImages', {}, {
+            // console.log(path);
+            return await axios.post('/api/getImages' + path, { fileNames }, {
                 headers: {
                     "Authorization": store.user.idToken
                 }
             }).then((res) => {
                 store.loading.off();
                 if (res.data.urls) {
-                    this.images = res.data.urls
+                    return res.data.urls
                 } else {
                     console.error('Failed to load images:', res.data.message);
                 }
@@ -355,22 +361,29 @@ export const store = reactive({
             })
         },
 
-        async uploadImg(selectedFile) {
+        async uploadImg(selectedFile, path = '') {
 
             store.loading.on();
+
             if (!selectedFile) {
                 store.loading.off();
                 console.error('No file selected!');
-                return;
+                return null;
             }
 
-            const reader = new FileReader();
-            reader.readAsDataURL(selectedFile);
-            reader.onload = async () => {
-                const base64Image = reader.result.split(',')[1];
+            try {
+                // Converti il file in base64 utilizzando una Promise
+                const base64Image = await new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.readAsDataURL(selectedFile);
+                    reader.onload = () => resolve(reader.result.split(',')[1]);
+                    reader.onerror = reject;
+                });
+
                 const fileName = selectedFile.name;
 
-                axios.post('/api/uploadImage', {
+                // Effettua la richiesta di upload
+                return await axios.post('/api/uploadImage' + path, {
                     base64Image,
                     fileName
                 }, {
@@ -380,17 +393,22 @@ export const store = reactive({
                 }).then((res) => {
                     store.loading.off();
                     if (res.data) {
-                        const [[key, value]] = Object.entries(res.data);
-                        store.firebase.images[key] = value
-                    } else {
-                        console.error('Upload failed:', response.data);
-                    }
-                }).catch((error) => {
-                    store.loading.off();
-                    console.error('Upload error:', error);
-                });
+                        const [key, value] = Object.entries(res.data)[0]
+                        console.log(key);
 
-            };
+                        return key;
+                    } else {
+                        console.error('Upload failed:', res);
+                        return null;
+                    }
+                })
+
+
+            } catch (error) {
+                store.loading.off();
+                console.error('Upload error:', error);
+                return null;
+            }
 
         },
 

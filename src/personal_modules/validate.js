@@ -63,6 +63,9 @@ export default {
                         this.VL_endDate(form, value, varName, query)
                         break;
 
+                    case 'time':
+                        this.VL_time(form, value, varName)
+                        break;
                     default:
                         console.error('Tipo di validazione non corretta. Controllare README.md')
                         return '';
@@ -264,6 +267,21 @@ export default {
                 new Date(query) <= new Date(value)
             ) {
                 this.VL[form][varName] = true;
+            } else {
+                this.VL[form][varName] = false;
+            }
+        } else {
+            if (this.VL[form][varName] !== null) {
+                this.VL[form][varName] = false;
+            }
+        }
+    },
+
+    VL_time(form, value, varName) {
+        const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
+        if (value.length) {
+            if (timeRegex.test(value)) {
+                this.VL[form][varName] = true
             } else {
                 this.VL[form][varName] = false;
             }
