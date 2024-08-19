@@ -105,7 +105,7 @@ exports.handler = async function (event, context) {
               fileName.shift();
             }
             fileName = fileName[0]
-            
+
             if (fileNames.includes(fileName)) {
 
               let expires = new Date();
@@ -178,16 +178,22 @@ exports.handler = async function (event, context) {
       });
 
       // Route per eliminare l'immagine
-      await router.POST('deleteImage', async () => {
-        const { fileName } = router.bodyParams;
+      await router.POST('d-img', async () => {
+        const { imgName } = router.bodyParams;
 
-        if (fileName) {
-          const fullPath = `users/${firebase.user.uid}/${fileName}`;
+        let dbPath = '';
+        if (router.pathParams.length >= 2) {
+          for (let index = 1; index < router.pathParams.length; index++) {
+            dbPath += '/' + router.pathParams[index];
+          }
+        }
+
+        if (imgName) {
+          const fullPath = `users/${firebase.user.uid + dbPath}/${imgName}`;
           try {
             await bucket.file(fullPath).delete();
-            console.log(fileName);
 
-            router.setRes({ deleted: fileName });
+            router.setRes({ deleted: imgName });
           } catch (error) {
             console.error('Failed to delete image:', error);
             router.error(500, 'Failed to delete image');

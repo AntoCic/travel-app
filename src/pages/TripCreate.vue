@@ -96,10 +96,10 @@ export default {
     return {
       store,
       validate,
-      title: '',
-      description: '',
-      startDate: '',
-      endDate: '',
+      title: 'TripBello',
+      description: 'Il piú bello',
+      startDate: '2024-07-12',
+      endDate: '2024-07-19',
       tripType: '',
       tripTypeIndex: null
     }

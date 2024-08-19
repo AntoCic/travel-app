@@ -116,10 +116,10 @@ export default {
     return {
       store,
       validate,
-      name: 'ddd',
-      location: 'ddd',
-      startTime: '12:15',
-      endTime: '12:17',
+      name: 'Name ',
+      location: 'location',
+      startTime: '12:00',
+      endTime: '13:00',
       images: [],
       description: '',
       food: '',
@@ -167,10 +167,10 @@ export default {
           }
         }
 
-        const newTrip = await this.store.stage.add(outer)
+        const newTrip = await this.store.trip.addStage(outer)
         if (newTrip) {
           this.resetForm()
-          this.$router.push({ name: 'home' });
+          this.$router.push({ name: 'trip.show', params: { id: this.id } });
         } else {
           alert('Errore onSubmitTrip contattare assistenza');
         }

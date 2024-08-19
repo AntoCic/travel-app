@@ -9,11 +9,6 @@ export const store = reactive({
         this.user.checkLogged()
         console.log('-START-');
         this.trip.getTypes();
-
-        // const stage = new Stage();
-        // console.log(stage);
-
-
     },
 
     onLogin() {
@@ -22,22 +17,13 @@ export const store = reactive({
         this.trip.get();
     },
 
-    stage: {
-        all: {},
-        async add(stage) {
-            let newStage = new Stage(stage);
-            newStage = await newStage.save()
-            const key = Object.keys(newStage)[0];
-            this.all[key] = newStage[key];
-            return newStage
-        },
-    },
 
     trip: {
         types: null,
         all: {},
         async get() {
             this.all = await Trip.get()
+            console.log(this.all);
             return this.all
         },
 
@@ -47,6 +33,15 @@ export const store = reactive({
             const key = Object.keys(newTrip)[0];
             this.all[key] = newTrip[key];
             return newTrip
+        },
+
+        async delete(id) {
+            let isSure = confirm('Sicuro di voler eliminare il viaggio?')
+            if (isSure) {
+
+            } else {
+                return false
+            }
         },
 
         async getTypes() {
@@ -69,6 +64,16 @@ export const store = reactive({
                     store.loading.off();
                     return false
                 })
+        },
+
+
+        async addStage(stage) {
+            let newStage = new Stage(stage);
+            newStage = await newStage.save()
+            const key = Object.keys(newStage)[0];
+            this.all[stage.trip_id].day[stage.date][key] = newStage[key]
+            console.log(this.all);
+            return newStage
         },
     },
 
@@ -430,8 +435,6 @@ export const store = reactive({
                 console.error('Delete error:', error);
             })
         },
-
-
 
     },
 

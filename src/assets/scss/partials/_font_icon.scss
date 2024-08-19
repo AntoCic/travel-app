@@ -17,7 +17,7 @@
 }
 
 .f-Audiowide {
-  font-family: Audiowide;
+  font-family: Audiowide, sans-serif;
 }
 
 @font-face {
@@ -26,7 +26,7 @@
 }
 
 .f-PermanentMarker {
-  font-family: PermanentMarker;
+  font-family: PermanentMarker, sans-serif;
 }
 
 @font-face {
@@ -35,14 +35,16 @@
 }
 
 .f-Quicksand {
-  font-family: Quicksand;
+  font-family: Quicksand, sans-serif;
 }
 
-// @font-face {
-//   font-family: Quicksand;
-//   src: url('../../../../public/fonts/Quicksand/Quicksand-VariableFont_wght.ttf');
-// }
+@font-face {
+  font-family: Codystar;
+  src: url('../../../../public/fonts/Codystar/Codystar-Regular.ttf');
+}
 
-// .f-Quicksand {
-//   font-family: Quicksand;
-// }
+.f-Codystar {
+  font-family: Codystar, sans-serif;
+  font-weight: 500;
+  font-style: normal;
+}

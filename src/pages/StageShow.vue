@@ -44,7 +44,6 @@
         <p>food : {{ stage.food }}</p>
         <p>curiosities : {{ stage.curiosities }}</p>
         <p>rating : {{ stage.rating ?? 0 }}</p>
-
       </div>
     </div>
   </div>

@@ -24,6 +24,7 @@ export default class Stage {
         };
 
         const optional = {
+            id: '',
             images: null,
             description: null,
             food: null,
@@ -50,13 +51,44 @@ export default class Stage {
                 "Authorization": store.user.idToken
             }
         })
-            .then((res) => {
+            .then(async (res) => {
+                const [stageKey] = Object.entries(res.data)[0];
+                res.data[stageKey].images = await store.firebase.loadImg(res.data[stageKey].images, `/${res.data[stageKey].trip_id}/${res.data[stageKey].date}`)
+                res.data[stageKey].id = stageKey
+                res.data[stageKey] = new Stage(res.data[stageKey])
                 return res.data
             })
             .catch((error) => {
                 console.error(error)
                 return false
             });
+    }
+
+    async delete() {
+        // for (const date in this.day) {
+        //     for (const stageKey in this.day[date]) {
+        //         for (const imgName in this.day[date][stageKey].images) {
+        //             await Trip.deleteImg(this.id, date, imgName);
+        //         }
+        //     }
+        // }
+
+        return await axios.delete(`/api/d/trips/${this.trip_id}/day/${this.date}`, { data: { id: this.id }, headers: { "Authorization": store.user.idToken } })
+            .then((res) => {
+                console.log(res.data);
+                if (res.data.deleted) {
+                    return res.data.deleted
+                } else {
+                    return false
+                }
+
+            })
+            .catch((error) => {
+                console.error(error)
+                store.loading.off();
+                return false
+            })
+
     }
 
 }

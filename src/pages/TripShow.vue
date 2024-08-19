@@ -24,7 +24,7 @@
     <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4">
       <!-- <RouterLink :to="{ name: 'stage.create', params: { id, date: key } }" class="col p-2" -->
       <div class="col p-2" v-for="(day, key) in trip.day" :key="key">
-        <div class="border rounded p-2 pt-3 position-relative">
+        <div class="border rounded pt-3 position-relative">
           <span class="position-absolute top-0 start-0 translate-middle-y badge rounded bg-light text-orange-l">
             {{ key }}
           </span>
@@ -37,15 +37,28 @@
             </RouterLink>
           </span>
           <template v-if="Object.keys(day).length > 0">
-            <p v-for="(stage, stageid) in day" :key="stageid" class="mb-0">
-              <RouterLink :to="{ name: 'stage.show', params: { id, date: key, stageid } }">
-                {{ stage.name }}
-              </RouterLink>
-            </p>
+            <div v-for="(stage, stageid) in day" :key="stageid"
+              class="border px-1 d-flex align-items-center m-1 p-1 rounded">
+              <p class="mb-0">
+                <RouterLink :to="{ name: 'stage.show', params: { id, date: key, stageid } }">
+                  {{ stage.startTime }} | {{ stage.name }}
+                </RouterLink>
+              </p>
+              <span @click="deleteStage(stage)" class="btn btn-outline-danger border-0 ms-auto p-1 ">
+                <span class="material-symbols-outlined">
+                  delete
+                </span>
+              </span>
+            </div>
           </template>
           <p v-else class="mb-0">Ancora nessuna attivita per {{ key }}</p>
 
         </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-12">
+        <button class="btn btn-outline-danger w-100 mt-3" @click="deleteTrip"> Elimina Viaggio</button>
       </div>
     </div>
   </div>
@@ -75,6 +88,24 @@ export default {
     }
   },
   methods: {
+    async deleteTrip() {
+      const isDeleted = await this.trip.delete()
+      if (isDeleted) {
+        delete this.store.trip.all[isDeleted]
+        this.$router.push({ name: 'home' })
+      } else {
+        alert('Non eliminato')
+      }
+    },
+    async deleteStage(stage) {
+      const isDeleted = await stage.delete()
+      if (isDeleted) {
+        delete this.store.trip.all[stage.trip_id].day[stage.date][isDeleted]
+        // this.$router.push({ name: 'home' })
+      } else {
+        alert('Non eliminato')
+      }
+    }
 
   },
   computed: {
