@@ -66,6 +66,7 @@ exports.handler = async function (event, context) {
 
       await router.PUT('u', async () => {
         const { id, ...data } = router.bodyParams
+
         if (id && data) {
           const item = await firebase.users.update(id, data, router.pathParams);
           router.setRes(item);
@@ -203,7 +204,11 @@ exports.handler = async function (event, context) {
         }
       });
 
+    } else {
+      console.log(['non mach authToken']);
     }
+  } else {
+    console.log(['non authToken']);
   }
   return router.sendRes()
 
@@ -268,14 +273,13 @@ class Firebase {
         dbPath += '/' + pathParams[index];
       }
     }
-
     if (this.userUid !== null) {
-      await db.ref(`${this.dbName}/${this.userUid + dbPath}`).update({ [id]: data });
+      await db.ref(`${this.dbName}/${this.userUid + dbPath}`).update({ [id]: data.data });
     } else {
-      await db.ref(this.dbName + dbPath).update({ [id]: data });
+      await db.ref(this.dbName + dbPath).update({ [id]: data.data });
     }
 
-    return { [id]: data };
+    return { [id]: data.data };
   }
 
   async delete(id, pathParams = []) {

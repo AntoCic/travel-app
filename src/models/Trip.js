@@ -67,7 +67,6 @@ export default class Trip {
             }
             trip[key].id = key
             trip[key] = new Trip(trip[key])
-            // console.log(trip[key].day);
         }
         return trip
     }
@@ -130,6 +129,21 @@ export default class Trip {
             })
 
     }
-
-
+    
+    async update(data) {
+        return await axios.put('/api/u/trips', { data, id: this.id }, {
+            headers: {
+                "Authorization": store.user.idToken
+            }
+        })
+            .then(async (res) => {
+                console.log(res.data);
+                
+                return await Trip.parse(res.data);
+            })
+            .catch((error) => {
+                console.error(error)
+                return false
+            });
+    }
 }

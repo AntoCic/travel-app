@@ -57,8 +57,14 @@
       </div>
     </div>
     <div class="row">
+      <div class="col-12 mt-3">
+        <RouterLink :to="{ name: 'trip.update', params: { id } }" type="button"
+          class="btn btn-outline-warning w-100 mb-1">
+          Modifica Viaggio
+        </RouterLink>
+      </div>
       <div class="col-12">
-        <button class="btn btn-outline-danger w-100 mt-3" @click="deleteTrip"> Elimina Viaggio</button>
+        <button class="btn btn-outline-danger w-100 " @click="deleteTrip"> Elimina Viaggio</button>
       </div>
     </div>
   </div>
@@ -101,7 +107,6 @@ export default {
       const isDeleted = await stage.delete()
       if (isDeleted) {
         delete this.store.trip.all[stage.trip_id].day[stage.date][isDeleted]
-        // this.$router.push({ name: 'home' })
       } else {
         alert('Non eliminato')
       }

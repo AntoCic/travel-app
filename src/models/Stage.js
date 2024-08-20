@@ -64,14 +64,29 @@ export default class Stage {
             });
     }
 
+    static async deleteImg(id, date, imgName) {
+
+        return await axios.post(`/api/d-img/${id}/${date}`, { imgName }, {
+            headers: {
+                Authorization: store.user.idToken,
+            },
+        }).then(async (res) => {
+            if (res.data.deleted) {
+                return await res.data
+            } else {
+                console.error('Delete failed:', res.data);
+            }
+        }).catch((error) => {
+            store.loading.off();
+            console.error('Delete error:', error);
+        })
+    }
+
     async delete() {
-        // for (const date in this.day) {
-        //     for (const stageKey in this.day[date]) {
-        //         for (const imgName in this.day[date][stageKey].images) {
-        //             await Trip.deleteImg(this.id, date, imgName);
-        //         }
-        //     }
-        // }
+        for (const imgName in this.images) {
+            console.log(imgName);
+            await Stage.deleteImg(this.trip_id, this.date, imgName);
+        }
 
         return await axios.delete(`/api/d/trips/${this.trip_id}/day/${this.date}`, { data: { id: this.id }, headers: { "Authorization": store.user.idToken } })
             .then((res) => {
