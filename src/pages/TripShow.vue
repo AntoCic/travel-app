@@ -2,17 +2,16 @@
   <div class="container" v-if="trip">
     <div class="row">
       <div class="col-12">
-        <h1 class="text-center">{{ store.trip.types[trip.tripType].title_EN }}</h1>
+        <h1 class="text-center">{{ store.tripTypes.all[trip.tripType].title_EN }}</h1>
       </div>
       <div class="col-12 position-relative overflow-hidden p-0">
-        <img :src="store.firebase.getImgUrl(store.trip.types[trip.tripType].url_img)" class="w-100"
-          alt="copertina tipo viaggio">
+        <img :src="store.tripTypes.getImgUrl(trip.tripType)" class="w-100" alt="copertina tipo viaggio">
         <div class="position-absolute top-0 start-0 w-100 h-100 overlay-animation">
           <img :src="overlay[Math.floor(Math.random() * 6)]" class="w-100 opacity-75" alt="">
           <h4
             class="position-absolute top-50 start-0 translate-middle-y ms-2 mt-2 mb-0 f-PermanentMarker text-orange-l text-shadow"
             style="width: 40%;">
-            {{ store.trip.types[trip.tripType].description_IT }}
+            {{ store.tripTypes.all[trip.tripType].description_IT }}
           </h4>
         </div>
       </div>

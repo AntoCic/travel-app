@@ -292,8 +292,3 @@ export default {
         }
     },
 }
-
-// <p :class="validate.showError('title')"> Il campo deve contenere un minimo di 3 caratteri e un massimo di 100. </p>
-
-// <p :class="validate.showError('endDate')"> Compila entrambe le date. La data di inizio deve essere antecedente alla data di fine. </p>
-

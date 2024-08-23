@@ -10,8 +10,8 @@
         </h4>
       </div>
     </div>
-    <template v-if="store.user.isLogged">
 
+    <template v-if="store.userJWT">
 
       <div class="row">
         <div class="col-auto ms-auto">
@@ -31,8 +31,7 @@
         <RouterLink :to="{ name: 'trip.show', params: { id: key } }" class="col p-1"
           v-for="(trip, key) in store.trip.all" :key="key">
           <div class="card h-100 shadow">
-            <img :src="store.firebase.getImgUrl(store.trip.types[trip.tripType].url_img)" class="card-img-top"
-              alt="cover travel">
+            <img :src="store.tripTypes.getImgUrl(trip.tripType)" class="card-img-top" alt="cover travel">
             <div class="card-body  pb-0">
               <h5 class="card-title mb-0">{{ trip.title }}</h5>
               <p class="card-text mb-0 text-end"><small>{{ trip.startDate }} - {{ trip.endDate }}</small></p>
@@ -42,6 +41,7 @@
         </RouterLink>
       </div>
     </template>
+
     <div class="row" v-else>
       <RouterLink to="/user"
         class="col-12 col-md-8 mx-auto border mt-3 text-center text-white bg-sky-blue rounded-btn h-opacity">

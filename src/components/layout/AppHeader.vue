@@ -10,9 +10,8 @@
         </div>
 
         <div class="col-auto">
-          <button v-if="store.user.isLogged" @click="store.user.logout"
-            class="btn btn-outline-danger border-0 px-1 me-1 mt-3">
-            <span v-if="store.user.userName" class="me-1">{{ store.user.userName }}</span>
+          <button v-if="user.accessToken" @click="user.logout" class="btn btn-outline-danger border-0 px-1 me-1 mt-3">
+            <span v-if="user.userName" class="me-1">{{ user.userName }}</span>
             <span class="material-symbols-outlined align-top">
               logout
             </span>
@@ -30,11 +29,11 @@
 </template>
 
 <script>
-import { store } from '../../store.js'
+import { user } from '../../user.js';
 export default {
   data() {
     return {
-      store,
+      user,
     }
   },
   mounted() {
@@ -62,5 +61,4 @@ export default {
 .simple {
   text-shadow: $yellow 1px 1px 0;
 }
-
 </style>

@@ -4,21 +4,20 @@
       <div class="col-12">
         <h2 class="text-center">Aggiungi un viaggio</h2>
       </div>
-      <template v-if="store.trip.types">
+      <template v-if="store.tripTypes.all">
         <div class="col-12">
           <h5>Seleziona un tipo di viaggio</h5>
           <div class="carousel slide">
             <div class="carousel-indicators">
-              <button v-for="(_type, key, index) in store.trip.types" :key="fillTripTypeIndex(index, key) + 'tbtn'"
+              <button v-for="(_type, key, index) in store.tripTypes.all" :key="fillTripTypeIndex(index, key) + 'tbtn'"
                 type="button" data-bs-target="" @click="nextTypeTrip(key)"
                 :class="index === tripTypeIndex[tripType] ? 'active' : ''"></button>
             </div>
             <div class="carousel-inner">
 
-              <div v-for="(_type, key, index) in store.trip.types" :key="key + 'timg'"
+              <div v-for="(_type, key, index) in store.tripTypes.all" :key="key + 'timg'"
                 :class="['carousel-item', index === tripTypeIndex[tripType] ? 'active' : '']">
-                <img :src="store.firebase.getImgUrl(_type.url_img)" class="d-block w-100"
-                  :alt="'trip ' + _type.title_IT">
+                <img :src="Object.values(_type.files)[0].url" class="d-block w-100" :alt="'trip ' + _type.title_IT">
                 <div class="carousel-caption d-block">
                   <h5>{{ _type.title_EN }}</h5>
                   <p class="carousel-caption d-none d-md-block">{{ _type.description_IT }}</p>
@@ -39,7 +38,7 @@
         </div>
         <div class="col-12 mt-1 mb-2">
           <select class="form-select" v-model="tripType">
-            <option v-for="(_type, key, index) in store.trip.types" :key="key + 'timg'" :value="key">
+            <option v-for="(_type, key, index) in store.tripTypes.all" :key="key + 'timg'" :value="key">
               {{ _type.title_EN }}
               <small>({{ _type.title_IT }})</small>
             </option>
@@ -143,13 +142,18 @@ export default {
 
     async onSubmitTrip() {
       if (this.validate.isAllValidated()) {
-        const newTrip = await this.store.trip.add(this.sendObj(["title", "description", "startDate", "endDate", "tripType"]))
-        if (newTrip) {
-          this.resetForm()
-          this.$router.push({ name: 'home' });
-        } else {
-          alert('Errore onSubmitTrip contattare assistenza');
-        }
+        console.log(this.sendObj(["title", "description", "startDate", "endDate", "tripType"]));
+
+        await this.store.trip.add(this.sendObj(["title", "description", "startDate", "endDate", "tripType"]));
+        this.resetForm()
+
+        // const newTrip = await this.store.trip.add(this.sendObj(["title", "description", "startDate", "endDate", "tripType"]))
+        // if (newTrip) {
+        //   this.resetForm()
+        //   this.$router.push({ name: 'home' });
+        // } else {
+        //   alert('Errore onSubmitTrip contattare assistenza');
+        // }
       } else {
         alert('Per favore, completa tutti i campi correttamente.');
       }

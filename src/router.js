@@ -1,5 +1,8 @@
 import { createWebHistory, createRouter } from 'vue-router'
 
+
+
+
 import HomeView from './pages/HomeView.vue'
 import ContactView from './pages/ContactView.vue'
 import UserView from './pages/UserView.vue'
@@ -9,12 +12,20 @@ import StageCreate from './pages/StageCreate.vue'
 import StageShow from './pages/StageShow.vue'
 import TripUpdate from './pages/TripUpdate.vue'
 
-export default createRouter({
-  history: createWebHistory(),
-  routes: [
+// Definizione delle rotte complete
+const fullRoutes = {
+  public: [ // Aggiungi le rotte publiche qui, visibili sia da autenticacto che da non autenticato.
+
     { path: '/', name: 'home', component: HomeView },
-    { path: '/user', name: 'user', component: UserView },
     { path: '/contact', name: 'contact', component: ContactView },
+
+  ],
+  notAuth: [ // Aggiungi le rotte visibili solo se non sei autenticato qui, se necessario.
+
+    { path: '/user', name: 'user', component: UserView },
+
+  ],
+  auth: [ // Aggiungi le rotte visibili solo se autenticato qui, se necessario.
 
     // trip
     { path: '/trip-new', name: 'trip.create', component: TripCreate },
@@ -22,5 +33,21 @@ export default createRouter({
     { path: '/trip/update/:id', name: 'trip.update', component: TripUpdate, props: true },
     { path: '/trip/:id/:date', name: 'stage.create', component: StageCreate, props: true },
     { path: '/trip/:id/:date/:stageid', name: 'stage.show', component: StageShow, props: true },
+
   ],
-})
+};
+
+
+
+
+
+// funzione interna che crea l'Object routes che contiene gli array con i
+const routes = Object.keys(fullRoutes).reduce((acc, key) => {
+  acc[key] = fullRoutes[key].map(route => route.name);
+  return acc;
+}, {});
+
+const routerRoutes = [...fullRoutes.public, ...fullRoutes.notAuth, ...fullRoutes.auth];
+const router = createRouter({ history: createWebHistory(), routes: routerRoutes })
+
+export { router, routes };
