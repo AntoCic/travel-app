@@ -4,7 +4,7 @@
       <div class="col-12">
         <h1 class="text-center">{{ store.tripTypes.all[trip.tripType].title_EN }}</h1>
       </div>
-      <div class="col-12 position-relative overflow-hidden p-0">
+      <div class="col-12 col-12 col-md-10 mx-auto mb-3 position-relative overflow-hidden p-0">
         <img :src="store.tripTypes.getImgUrl(trip.tripType)" class="w-100" alt="copertina tipo viaggio">
         <div class="position-absolute top-0 start-0 w-100 h-100 overlay-animation">
           <img :src="overlay[Math.floor(Math.random() * 6)]" class="w-100 opacity-75" alt="">
@@ -36,19 +36,23 @@
             </RouterLink>
           </span>
           <template v-if="Object.keys(day).length > 0">
-            <div v-for="(stage, stageid) in day" :key="stageid"
-              class="border px-1 d-flex align-items-center m-1 p-1 rounded">
-              <p class="mb-0">
-                <RouterLink :to="{ name: 'stage.show', params: { id, date: key, stageid } }">
-                  {{ stage.startTime }} | {{ stage.name }}
-                </RouterLink>
-              </p>
-              <span @click="deleteStage(stage)" class="btn btn-outline-danger border-0 ms-auto p-1 ">
-                <span class="material-symbols-outlined">
-                  delete
+            <template v-if="store.stage.all">
+              <div v-for="(stage, stageid) in day" :key="stageid"
+                class="border px-1 d-flex align-items-center m-1 p-1 rounded">
+                <p class="mb-0">
+                  <RouterLink :to="{ name: 'stage.show', params: { id, date: key, stageid } }">
+                    {{ store.stage.all[stageid].startTime }} | {{ store.stage.all[stageid].name }}
+                  </RouterLink>
+                </p>
+                <span @click="deleteStage(stageid, store.stage.all[stageid].date)"
+                  class="btn btn-outline-danger border-0 ms-auto p-1 ">
+                  <span class="material-symbols-outlined">
+                    delete
+                  </span>
                 </span>
-              </span>
-            </div>
+              </div>
+            </template>
+            <p v-else class="mb-0 text-center">...Caricamento</p>
           </template>
           <p v-else class="mb-0">Ancora nessuna attivita per {{ key }}</p>
 
@@ -94,20 +98,30 @@ export default {
   },
   methods: {
     async deleteTrip() {
-      const isDeleted = await this.trip.delete()
-      if (isDeleted) {
-        delete this.store.trip.all[isDeleted]
-        this.$router.push({ name: 'home' })
-      } else {
-        alert('Non eliminato')
+      this.store.loading.on();
+      for (const date in this.trip.day) {
+        for (const stageId in this.trip.day[date]) {
+          delete this.store.trip.all[this.id].day[date]
+          await this.store.stage.all[stageId].delete();
+          delete this.store.stage.all[stageId]
+        }
       }
+      await this.store.trip.all[this.id].delete();
+      delete this.store.trip.all[this.id]
+      this.store.loading.off();
+      this.$router.push({ name: 'home' })
     },
-    async deleteStage(stage) {
-      const isDeleted = await stage.delete()
-      if (isDeleted) {
-        delete this.store.trip.all[stage.trip_id].day[stage.date][isDeleted]
+    async deleteStage(id, date) {
+      this.store.loading.on();
+      const deleted = await this.store.stage.all[id].delete();
+      if (deleted) {
+        delete this.store.trip.all[this.id].day[date][deleted]
+        this.store.trip.all[this.id].update()
+        delete this.store.stage.all[deleted]
+        this.store.loading.off();
       } else {
-        alert('Non eliminato')
+        console.error('Errore delete item');
+        this.store.loading.off();
       }
     }
 

@@ -38,15 +38,15 @@ export default class Trip extends FIREBASE {
                 if (!trip[key].day[newDay]) {
                     trip[key].day[newDay] = {};
                 } else {
-                    const stages = trip[key].day[newDay]
-                    console.log(stages);
-                    // for (const stageKey in stages) {
-                    //     if (stages[stageKey].images) {
-                    //         trip[key].day[newDay][stageKey].images = await store.firebase.loadImg(stages[stageKey].images, `/${key}/${newDay}`)
-                    //     }
-                    //     trip[key].day[newDay][stageKey].id = stageKey
-                    //     trip[key].day[newDay][stageKey] = new Stage(trip[key].day[newDay][stageKey])
-                    // }
+                    // const stages = trip[key].day[newDay]
+                    // console.log(stages);
+                    // // for (const stageKey in stages) {
+                    // //     if (stages[stageKey].images) {
+                    // //         trip[key].day[newDay][stageKey].images = await store.firebase.loadImg(stages[stageKey].images, `/${key}/${newDay}`)
+                    // //     }
+                    // //     trip[key].day[newDay][stageKey].id = stageKey
+                    // //     trip[key].day[newDay][stageKey] = new Stage(trip[key].day[newDay][stageKey])
+                    // // }
 
                 }
             }

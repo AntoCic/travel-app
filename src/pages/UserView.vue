@@ -17,7 +17,7 @@
                     alternate_email
                   </label>
                   <input type="email" :class="['form-control']" id="email" v-model="email"
-                    placeholder="Enter your Email">
+                    placeholder="Enter your Email" autocomplete="username">
 
                 </div>
               </div>
@@ -29,7 +29,7 @@
                     lock
                   </label>
                   <input :type="password_visibility ? 'text' : 'password'" :class="['form-control']" id="password"
-                    v-model="password" placeholder="Enter your Password">
+                    v-model="password" placeholder="Enter your Password" autocomplete="current-password">
 
                   <label v-if="password_visibility" for="password_visibility" class="material-symbols-outlined ps-1">
                     visibility
@@ -69,11 +69,11 @@
                   </label>
                   <input type="text"
                     :class="['form-control', validate.check({ registerUserName, type: 'string', query: [3, 100], form: 'register' })]"
-                    id="registerUserName" v-model="registerUserName" placeholder="Enter your Name">
+                    id="registerUserName" v-model="registerUserName" placeholder="Enter your Name" autocomplete="off">
                 </div>
-                <p :class="validate.showError('registerUserName')"> Il campo deve contenere un minimo di 3 caratteri e
-                  un
-                  massimo di 100. </p>
+                <p :class="validate.showError('registerUserName')">
+                  Il campo deve contenere un minimo di 3 caratteri e un massimo di 100.
+                </p>
               </div>
 
               <div class="mb-2">
@@ -84,7 +84,7 @@
                   </label>
                   <input type="email"
                     :class="['form-control', validate.check({ registerEmail, type: 'email', form: 'register' })]"
-                    id="registerEmail" v-model="registerEmail" placeholder="Enter your Email">
+                    id="registerEmail" v-model="registerEmail" placeholder="Enter your Email" autocomplete="username">
                 </div>
                 <p :class="validate.showError('registerEmail')"> Email non valida. Controlla e riprova. </p>
               </div>
@@ -98,7 +98,7 @@
 
                   <input :type="password_visibility ? 'text' : 'password'"
                     :class="['form-control', validate.check({ registerPassword, type: 'password', form: 'register' })]"
-                    id="registerPassword" v-model="registerPassword" placeholder="Enter your Password">
+                    id="registerPassword" v-model="registerPassword" placeholder="Enter your Password" autocomplete="off">
 
                   <label v-if="password_visibility" for="registerPassword_visibility"
                     class="material-symbols-outlined ps-1">
@@ -110,8 +110,7 @@
                   <input type="checkbox" class="d-none" v-model="password_visibility" id="registerPassword_visibility">
                 </div>
                 <p :class="validate.showError('registerPassword')"> Il campo deve contenere almeno 8 caratteri,
-                  includendo
-                  almeno una lettera maiuscola e almeno un numero. </p>
+                  includendo almeno una lettera maiuscola e almeno un numero. </p>
               </div>
 
               <div class="mb-3">
@@ -123,7 +122,7 @@
                   </label>
                   <input :type="password_visibility ? 'text' : 'password'"
                     :class="['form-control', validate.check({ registerRetypePassword, type: 'retype-password', query: registerPassword, form: 'register' })]"
-                    id="registerRetypePassword" v-model="registerRetypePassword" placeholder="Enter your Password">
+                    id="registerRetypePassword" v-model="registerRetypePassword" placeholder="Enter your Password" autocomplete="off">
 
                   <label v-if="password_visibility" for="registerRetypePassword_visibility"
                     class="material-symbols-outlined ps-1">

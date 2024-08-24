@@ -5,7 +5,7 @@
         <h2 class="text-center">Aggiungi un viaggio</h2>
       </div>
       <template v-if="store.tripTypes.all">
-        <div class="col-12">
+        <div class="col-12 col-md-8 mx-auto">
           <h5>Seleziona un tipo di viaggio</h5>
           <div class="carousel slide">
             <div class="carousel-indicators">
@@ -36,7 +36,7 @@
           </div>
 
         </div>
-        <div class="col-12 mt-1 mb-2">
+        <div class="col-12 col-md-8 mx-auto mt-1 mb-2">
           <select class="form-select" v-model="tripType">
             <option v-for="(_type, key, index) in store.tripTypes.all" :key="key + 'timg'" :value="key">
               {{ _type.title_EN }}
@@ -130,7 +130,6 @@ export default {
       }
     },
     prevTypeTrip() {
-
       const nextIndex = this.tripTypeIndex[this.tripType] - 1;
       let lastKey;
       const nextType = Object.entries(this.tripTypeIndex).find(([_key, i]) => {
@@ -142,18 +141,11 @@ export default {
 
     async onSubmitTrip() {
       if (this.validate.isAllValidated()) {
-        console.log(this.sendObj(["title", "description", "startDate", "endDate", "tripType"]));
-
+        this.store.loading.on();
         await this.store.trip.add(this.sendObj(["title", "description", "startDate", "endDate", "tripType"]));
         this.resetForm()
-
-        // const newTrip = await this.store.trip.add(this.sendObj(["title", "description", "startDate", "endDate", "tripType"]))
-        // if (newTrip) {
-        //   this.resetForm()
-        //   this.$router.push({ name: 'home' });
-        // } else {
-        //   alert('Errore onSubmitTrip contattare assistenza');
-        // }
+        this.store.loading.off();
+        this.$router.push({ name: 'home' });
       } else {
         alert('Per favore, completa tutti i campi correttamente.');
       }

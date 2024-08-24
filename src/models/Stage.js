@@ -27,8 +27,6 @@ export default class Stage extends FIREBASE {
         };
 
         const optional = {
-            id: '',
-            images: null,
             description: null,
             food: null,
             curiosities: null,

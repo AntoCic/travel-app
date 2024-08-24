@@ -39,7 +39,6 @@ export const user = reactive({
                 } else {
                     this.userName = await this.getUserName()
                 }
-                // store.loading.off();
             } else {
                 this.reset();
             }
@@ -49,7 +48,6 @@ export const user = reactive({
     // Metodo per eseguire il login
     async login(email, password) {
         try {
-            // store.loading.on();
             await signInWithEmailAndPassword(auth, email, password);
             return true
         } catch (error) {
@@ -60,7 +58,6 @@ export const user = reactive({
     },
     async googleLogin() {
         try {
-            // store.loading.on();
             await signInWithPopup(auth, provider);
             return true
         } catch (error) {
@@ -72,7 +69,6 @@ export const user = reactive({
     // Metodo per eseguire il register
     async register(userName, email, password) {
         try {
-            // store.loading.on();
             this.userName = userName
             await createUserWithEmailAndPassword(auth, email, password);
             return true
@@ -95,13 +91,11 @@ export const user = reactive({
             })
             .catch((error) => {
                 alert(error.message);
-                // store.loading.off();
                 console.error("Errore di reset della password:", error);
             });
     },
     // Metodo per eseguire il logout
     async getUserName() {
-        // store.loading.on();
         return await axios.post('/api/g/userdata/userName', {}, {
             headers: {
                 "Authorization": this.accessToken
@@ -122,7 +116,6 @@ export const user = reactive({
             })
             .catch((error) => {
                 console.error(error)
-                // store.loading.off();
                 return null
             })
 
@@ -130,7 +123,6 @@ export const user = reactive({
     },
     // Metodo per eseguire il logout
     async addUserName(userName) {
-        // store.loading.on();
 
         const id = 'userName'
         const data = userName
@@ -149,7 +141,6 @@ export const user = reactive({
             })
             .catch((error) => {
                 console.error(error)
-                // store.loading.off();
                 return null
             })
 

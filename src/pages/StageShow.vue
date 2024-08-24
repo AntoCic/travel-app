@@ -1,19 +1,19 @@
 <template>
   <div class="container" v-if="stage">
     <div class="row">
-      <div class="col-12" v-if="stage.images">
+      <div class="col-12 col-md-8 col-lg-6 mx-auto" v-if="stage.files">
         <div id="carouselExampleCaptions" class="carousel slide" data-bs-ride="carousel">
           <div class="carousel-indicators">
-            <button v-for="(imgName, key, i) in stage.images" :key="key + '-btn'" type="button"
+            <button v-for="(image, key, i) in stage.files" :key="key + '-btn'" type="button"
               data-bs-target="#carouselExampleCaptions" :data-bs-slide-to="i" :class="i === 0 ? 'active' : false"
               :aria-current="i === 0 ? 'true' : false" :aria-label="`Slide ${i + 1}`"></button>
           </div>
 
           <div class="carousel-inner">
 
-            <div v-for="(imgName, key, i) in stage.images" :key="key + '-img'"
+            <div v-for="(image, key, i) in stage.files" :key="key + '-img'"
               :class="['carousel-item', i === 0 ? 'active' : 'false']">
-              <img :src="imgName" class="d-block w-100" alt="img personale stage">
+              <img :src="image.url" class="d-block w-100" alt="img personale stage">
             </div>
 
           </div>
@@ -32,6 +32,8 @@
       <div class="col-12" v-else>
         <h1>no images</h1>
       </div>
+    </div>
+    <div class="row">
       <div class="col-6">
         <h3>{{ stage.name }}</h3>
       </div>
@@ -79,8 +81,8 @@ export default {
   },
   computed: {
     stage() {
-      if (this.store.trip.all && this.store.trip.all[this.id]) {
-        return this.store.trip.all[this.id].day[this.date][this.stageid]
+      if (this.store.trip.all && this.store.stage.all) {
+        return this.store.stage.all[this.stageid]
       } else {
         return false
       }
@@ -92,6 +94,4 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
-
-</style>
+<style lang="scss" scoped></style>

@@ -7,21 +7,20 @@
       <div class="col-12">
         <h2 class="text-center">Aggiungi un viaggio</h2>
       </div>
-      <template v-if="store.trip.types">
-        <div class="col-12">
+      <template v-if="store.tripTypes.all">
+        <div class="col-12 col-md-8 mx-auto">
           <h5>Seleziona un tipo di viaggio</h5>
           <div class="carousel slide">
             <div class="carousel-indicators">
-              <button v-for="(_type, key, index) in store.trip.types" :key="fillTripTypeIndex(index, key) + 'tbtn'"
+              <button v-for="(_type, key, index) in store.tripTypes.all" :key="fillTripTypeIndex(index, key) + 'tbtn'"
                 type="button" data-bs-target="" @click="nextTypeTrip(key)"
                 :class="index === tripTypeIndex[tripType] ? 'active' : ''"></button>
             </div>
             <div class="carousel-inner">
 
-              <div v-for="(_type, key, index) in store.trip.types" :key="key + 'timg'"
+              <div v-for="(_type, key, index) in store.tripTypes.all" :key="key + 'timg'"
                 :class="['carousel-item', index === tripTypeIndex[tripType] ? 'active' : '']">
-                <img :src="store.firebase.getImgUrl(_type.url_img)" class="d-block w-100"
-                  :alt="'trip ' + _type.title_IT">
+                <img :src="Object.values(_type.files)[0].url" class="d-block w-100" :alt="'trip ' + _type.title_IT">
                 <div class="carousel-caption d-block">
                   <h5>{{ _type.title_EN }}</h5>
                   <p class="carousel-caption d-none d-md-block">{{ _type.description_IT }}</p>
@@ -40,9 +39,9 @@
           </div>
 
         </div>
-        <div class="col-12 mt-1 mb-2">
+        <div class="col-12 col-md-8 mx-auto mt-1 mb-2">
           <select class="form-select" v-model="tripType">
-            <option v-for="(_type, key, index) in store.trip.types" :key="key + 'timg'" :value="key">
+            <option v-for="(_type, key, index) in store.tripTypes.all" :key="key + 'timg'" :value="key">
               {{ _type.title_EN }}
               <small>({{ _type.title_IT }})</small>
             </option>
@@ -151,13 +150,13 @@ export default {
     },
     async update() {
       if (this.validate.isAllValidated()) {
-        const newTrip = await this.trip.update(this.sendObj(["title", "description", "startDate", "endDate", "tripType"]))
-        console.log(newTrip);
-        if (newTrip[this.id]) {
-          this.store.trip.all[this.id] = newTrip[this.id]
-        } else {
-          alert('Errore onSubmitTrip contattare assistenza');
-        }
+        this.store.loading.on();
+        const tripUpdated = await this.store.trip.all[this.id].update(this.sendObj(["title", "description", "startDate", "endDate", "tripType"]))
+
+        this.store.trip.all[this.id] = Object.values(tripUpdated)[0];
+        this.resetForm()
+        this.store.loading.off();
+        this.$router.push({ name: 'trip.show', params: { id: this.id } });
       } else {
         alert('Per favore, completa tutti i campi correttamente.');
       }

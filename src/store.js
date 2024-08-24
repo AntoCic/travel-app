@@ -1,58 +1,45 @@
 import { reactive } from 'vue'
 import axios from 'axios'
-// import Stage from './models/Stage.js'
 import Trip from './models/Trip.js';
+import Stage from './models/Stage.js';
 export const store = reactive({
     userJWT: null,
 
     async start() {
-        console.log('-START-');
+        this.loading.on();
         this.tripTypes.get();
-        this.tripTypes.getImgUrl();
-        return
     },
 
     async onLogin() {
-        this.loading.on("Altri 2s per vedere il loader");
-
-        // this.item.get()
-        this.trip.get()
-
+        await this.trip.get()
+        await this.stage.get()
+        this.loading.on("Altri 3s per vedere bene il bellissimo il loader");
         setTimeout(() => {
             this.loading.off();
-        }, 2000);
-
-        // console.log('-Is logeed-');
-        // this.firebase.db_get();
-        // this.trip.get();
+        }, 3000);
     },
 
     onLogout() {
         console.log('- LOGOUT -');
+        this.loading.off();
     },
 
     tripTypes: {
         all: null,
         async get() {
-            store.loading.on();
             return await axios.get('/api/g-public/tripTypes', {}, {
                 headers: {
                     "Authorization": this.userJWT
                 }
+            }).then((res) => {
+                if (res.data) {
+                    this.all = res.data
+                }
+                return true
+            }).catch((error) => {
+                console.error(error)
+                return false
             })
-                .then((res) => {
-                    store.loading.off();
-                    if (res.data) {
-                        this.all = res.data
-                    }
-                    return true
-                })
-                .catch((error) => {
-                    console.error(error)
-                    store.loading.off();
-                    return false
-                })
-
         },
         getImgUrl(tripTypeId) {
             if (tripTypeId) {
@@ -62,11 +49,11 @@ export const store = reactive({
     },
 
     trip: {
-        all: {},
+        all: null,
 
         async get() {
             this.all = await Trip.get();
-            console.log(this.all);
+            return
         },
 
         async add(newTrip) {
@@ -78,69 +65,72 @@ export const store = reactive({
             }
         },
 
-        // async get() {
-        //     this.all = await Trip.get()
-        //     console.log(this.all);
-        //     return this.all
-        // },
-
-        // async add(trip) {
-        //     let newTrip = new Trip(trip);
-        //     newTrip = await newTrip.save()
-        //     const key = Object.keys(newTrip)[0];
-        //     this.all[key] = newTrip[key];
-        //     return newTrip
-        // },
-
-        // async delete(id) {
-        //     let isSure = confirm('Sicuro di voler eliminare il viaggio?')
-        //     if (isSure) {
-
-        //     } else {
-        //         return false
-        //     }
-        // },
-
-        // async getTypes() {
-        //     this.types = null
-        //     store.loading.on();
-        //     return await axios.get('/api/trip-type/tripTypes', {}, {
-        //         headers: {
-        //             "Authorization": store.user.idToken
-        //         }
-        //     })
-        //         .then((res) => {
-        //             store.loading.off();
-        //             if (res.data) {
-        //                 this.types = res.data
-        //             }
-        //             return true
-        //         })
-        //         .catch((error) => {
-        //             console.error(error)
-        //             store.loading.off();
-        //             return false
-        //         })
-        // },
-
-
-        // async addStage(stage) {
-        //     let newStage = new Stage(stage);
-        //     newStage = await newStage.save()
-        //     const key = Object.keys(newStage)[0];
-        //     this.all[stage.trip_id].day[stage.date][key] = newStage[key]
-        //     console.log(this.all);
-        //     return newStage
-        // },
     },
 
+    stage: {
+        all: null,
 
+        async get() {
+            this.all = await Stage.get();
+            return
+        },
 
+        async add(newStage) {
+            const added = await Stage.add(newStage, true);
+            if (added) {
+                this.all = { ...this.all, ...added }
+                return added
+            } else {
+                console.error('Errore adding item');
+                return false
+            }
+        },
+    },
+
+    // this.store.loading.on();
+    // this.store.loading.off();
     loading: {
         state: false,
         msg: "",
-        on(msg = "Loading...") {
-            this.msg = msg
+
+        loadingMessages: [
+            "Stiamo controllando se il sole splende nella tua destinazione...",
+            "Prepariamo le valigie virtuali... quasi pronti!",
+            "Stiamo mappando il percorso perfetto... non perderti!", -
+            "Ricerca di spiagge nascoste e avventure indimenticabili...",
+            "Caricamento della modalità vacanza... quasi lì!",
+            "Stiamo preparando il kit di sopravvivenza del viaggiatore... tieniti pronto!",
+            "Cercando destinazioni da sogno... solo un attimo!",
+            "Stiamo calcolando il tempo perfetto per il relax...",
+            "Prepariamo la mappa delle avventure... prendi il tuo zaino!",
+            "Scoprendo le gemme nascoste per te... resta sintonizzato!",
+            "Imballiamo esperienze uniche... la tua avventura inizia presto!",
+            "Stiamo allineando le stelle per il tuo viaggio perfetto...",
+            "Prepariamo il tuo itinerario da sogno... manca poco!",
+            "Prenota con anticipo per ottenere le migliori offerte sui voli.",
+            "Fai una lista di controllo per la valigia, così non dimentichi nulla di importante.",
+            "Porta sempre una copia dei tuoi documenti di viaggio, meglio essere prudenti!",
+            "Assicurati di avere adattatori di corrente per i paesi che visiterai.",
+            "Viaggia leggero: più spazio in valigia significa più spazio per i souvenir!",
+            "Prenota alloggi con cancellazione gratuita per maggiore flessibilità.",
+            "Non dimenticare il caricabatterie del telefono e una power bank per le emergenze.",
+            "Fai sempre una ricerca sulle usanze locali prima di partire, per viaggiare con rispetto.",
+            "Tieniti idratato durante il volo, specialmente sui viaggi a lungo raggio.",
+            "Metti in valigia un kit di pronto soccorso, non si sa mai!",
+            "Prepara uno zaino con gli oggetti essenziali per i tuoi spostamenti giornalieri.",
+            "Verifica le politiche sui bagagli della tua compagnia aerea per evitare sorprese.",
+            "Porta abiti versatili che puoi combinare facilmente tra loro.",
+            "Non dimenticare il costume da bagno, anche se non hai previsto di nuotare!",
+            "Porta con te una borsa ripiegabile: utile per lo shopping o per gli imprevisti."
+        ],
+
+        on(msg = null) {
+            if (msg === null) {
+                this.msg = this.loadingMessages[Math.floor(Math.random() * this.loadingMessages.length)]
+            } else {
+                this.msg = msg
+            }
+
             this.state = true
         },
         off() { this.state = false },

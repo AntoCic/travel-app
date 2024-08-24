@@ -115,6 +115,7 @@ export default {
                 this.files = [...this.files, ...newFiles];
                 for (const file of newFiles) {
                     if (this.fileType === 'img') {
+                        file.url = URL.createObjectURL(file);
                         this.url.push(URL.createObjectURL(file));
                     } else {
                         this.url.push(null);

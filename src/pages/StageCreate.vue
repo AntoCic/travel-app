@@ -46,7 +46,7 @@
       <!-- images -->
       <div class="col-12 mt-2">
         <div class="text-center">
-          <CmpDropFile @getImg="getFileList" fileType="img" :multiple="true" />
+          <CmpDropFile working="onUpload" @onUpload="getFileList" id="cpm-upload-files" fileType="img" multiple />
         </div>
 
         <!-- Display uploaded images -->
@@ -120,7 +120,6 @@ export default {
       location: 'location',
       startTime: '12:00',
       endTime: '13:00',
-      images: [],
       description: '',
       food: '',
       curiosities: '',
@@ -130,26 +129,13 @@ export default {
   methods: {
 
     async onSubmitTrip() {
-      // console.log(this.sendObj([
-      //   "name",
-      //   "location",
-      //   "startTime",
-      //   "endTime",
-      //   "images",
-      //   "description",
-      //   "food",
-      //   "curiosities"
-      // ]));
-
-
-
       if (this.validate.isAllValidated()) {
+        this.store.loading.on();
         let outer = this.sendObj([
           "name",
           "location",
           "startTime",
           "endTime",
-          "images",
           "description",
           "food",
           "curiosities"
@@ -161,19 +147,16 @@ export default {
           lat: 33065114516071,
           lon: 41528345635181,
         }
-        if (this.imgFiles.length > 0) {
-          for (const file of this.imgFiles) {
-            outer.images.push(await this.store.firebase.uploadImg(file, `/${this.id}/${this.date}`))
-          }
-        }
 
-        const newTrip = await this.store.trip.addStage(outer)
-        if (newTrip) {
-          this.resetForm()
-          this.$router.push({ name: 'trip.show', params: { id: this.id } });
-        } else {
-          alert('Errore onSubmitTrip contattare assistenza');
-        }
+        let newStage = await this.store.stage.add(outer);
+        newStage = Object.values(newStage)[0]
+        await newStage.uploadFiles(this.imgFiles);
+        const trip = this.store.trip.all[newStage.trip_id]
+        trip.day[newStage.date] = { ...trip.day[newStage.date], ...{ [newStage.id]: newStage.id } };
+        await trip.update()
+        this.resetForm()
+        this.store.loading.off();
+        this.$router.push({ name: 'trip.show', params: { id: this.id } });
       } else {
         alert('Per favore, completa tutti i campi correttamente.');
       }
@@ -194,7 +177,7 @@ export default {
       this.location = '';
       this.startTime = '';
       this.endTime = '';
-      this.images = [];
+      this.imgFiles = [];
       this.description = '';
       this.food = '';
       this.curiosities = '';
@@ -203,11 +186,8 @@ export default {
 
     getFileList(files) {
       for (const file of files) {
-        file.url = URL.createObjectURL(file);
         this.imgFiles.push(file)
       }
-      console.log(files)
-      // console.log(this.imageUrls);
     }
   },
   created() {
