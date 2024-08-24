@@ -188,7 +188,7 @@ export default class FIREBASE {
 
     async deleteFile(filekey) {
         const fileName = this.files[filekey].fileName
-        axios.post(`/api/d-file/${this.id}`, { fileName }, {
+        return await axios.post(`/api/d-file/${this.id}`, { fileName }, {
             headers: {
                 Authorization: FIREBASE.getAuth(),
             },
@@ -196,11 +196,14 @@ export default class FIREBASE {
             if (res.data.deleted) {
                 await this.delete(filekey, this.id + '/files')
                 delete this.files[filekey]
+                return filekey;
             } else {
                 console.error('Delete failed:', res.data);
+                return null;
             }
         }).catch((error) => {
             console.error('Delete error:', error);
+            return null;
         })
     }
 }

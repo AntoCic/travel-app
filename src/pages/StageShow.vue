@@ -48,6 +48,17 @@
         <p>rating : {{ stage.rating ?? 0 }}</p>
       </div>
     </div>
+    <div class="row">
+      <div class="col-12 mt-3">
+        <RouterLink :to="{ name: 'stage.update', params: { stageId, date } }" type="button"
+          class="btn btn-outline-warning w-100 mb-1">
+          Modifica attività
+        </RouterLink>
+      </div>
+      <div class="col-12">
+        <button class="btn btn-outline-danger w-100 " @click="deleteStage"> Elimina attività</button>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -56,15 +67,11 @@ import { store } from '../store.js'
 import validate from '../personal_modules/validate.js';
 export default {
   props: {
-    id: {
+    stageId: {
       type: String,
       required: true
     },
     date: {
-      type: String,
-      required: true
-    },
-    stageid: {
       type: String,
       required: true
     }
@@ -76,13 +83,17 @@ export default {
     }
   },
   methods: {
-
+    async deleteStage() {
+      const id = this.stage.trip_id
+      await this.store.stage.delete(this.stageId)
+      this.$router.push({ name: 'trip.show', params: { id } })
+    }
 
   },
   computed: {
     stage() {
       if (this.store.trip.all && this.store.stage.all) {
-        return this.store.stage.all[this.stageid]
+        return this.store.stage.all[this.stageId]
       } else {
         return false
       }

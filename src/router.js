@@ -11,6 +11,7 @@ import TripShow from './pages/TripShow.vue'
 import StageCreate from './pages/StageCreate.vue'
 import StageShow from './pages/StageShow.vue'
 import TripUpdate from './pages/TripUpdate.vue'
+import StageUpdate from './pages/StageUpdate.vue'
 
 // Definizione delle rotte complete
 const fullRoutes = {
@@ -31,8 +32,9 @@ const fullRoutes = {
     { path: '/trip-new', name: 'trip.create', component: TripCreate },
     { path: '/trip/:id', name: 'trip.show', component: TripShow, props: true },
     { path: '/trip/update/:id', name: 'trip.update', component: TripUpdate, props: true },
-    { path: '/trip/:id/:date', name: 'stage.create', component: StageCreate, props: true },
-    { path: '/trip/:id/:date/:stageid', name: 'stage.show', component: StageShow, props: true },
+    { path: '/stage/:tripId/:date', name: 'stage.create', component: StageCreate, props: true },
+    { path: '/stage/:stageId/:date/', name: 'stage.show', component: StageShow, props: true },
+    { path: '/stage/update/:stageId/:date/', name: 'stage.update', component: StageUpdate, props: true },
 
   ],
 };

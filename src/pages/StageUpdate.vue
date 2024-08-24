@@ -2,11 +2,11 @@
   <div class="container">
     <div class="row">
       <div class="col-12">
-        <h2 class="text-center">Aggiungi un attività</h2>
+        <h2 class="text-center">Modifica un attivita</h2>
       </div>
       <!-- name -->
       <div class="col-12 mb-2">
-        <label for="name" class="form-label mb-0 ms-1">Nome attività</label>
+        <label for="name" class="form-label mb-0 ms-1">Nome attivita</label>
         <div class="input-google-icon">
           <label for="name" class="material-symbols-outlined icon">
             filter_retrolux
@@ -50,17 +50,31 @@
         </div>
 
         <!-- Display uploaded images -->
-        <div v-if="imgFiles.length" class="mt-3 text-center">
-          <div v-for="(image, index) in imgFiles" :key="index" class="m-2 d-inline-block position-relative">
-            <img :src="image.url" alt="Uploaded Image" class="d-inline-block" width="150" />
-            <span type="button" @click="imgFiles.splice(index, 1)"
-              class="position-absolute top-0 start-100 translate-middle btn btn-outline-danger p-0 rounded-circle d-flex justify-content-center align-items-center"
-              style="width: 25px; aspect-ratio: 1/1;">
-              x
-              <span class="visually-hidden">Delete image</span>
-            </span>
-          </div>
+        <div class="mt-3 text-center">
+          <template v-if="imgFiles.length">
+            <div v-for="(image, index) in imgFiles" :key="index" class="m-2 d-inline-block position-relative">
+              <img :src="image.url" alt="Uploaded Image" class="d-inline-block" width="150" />
+              <span type="button" @click="imgFiles.splice(index, 1)"
+                class="position-absolute top-0 start-100 translate-middle btn btn-outline-danger p-0 rounded-circle d-flex justify-content-center align-items-center"
+                style="width: 25px; aspect-ratio: 1/1;">
+                x
+                <span class="visually-hidden">Delete image</span>
+              </span>
+            </div>
+          </template>
+          <template v-if="newImgFiles.length">
+            <div v-for="(image, index) in newImgFiles" :key="index" class="m-2 d-inline-block position-relative">
+              <img :src="image.url" alt="Uploaded Image" class="d-inline-block" width="150" />
+              <span type="button" @click="newImgFiles.splice(index, 1)"
+                class="position-absolute top-0 start-100 translate-middle btn btn-outline-danger p-0 rounded-circle d-flex justify-content-center align-items-center"
+                style="width: 25px; aspect-ratio: 1/1;">
+                x
+                <span class="visually-hidden">Delete image</span>
+              </span>
+            </div>
+          </template>
         </div>
+
       </div>
       <!-- description -->
       <div class="col-12 mb-2">
@@ -88,7 +102,7 @@
       </div>
 
       <div class="col-12">
-        <button class="btn btn-outline-success w-100" @click="onSubmitTrip">Aggiungi un attività</button>
+        <button class="btn btn-outline-success w-100" @click="onSubmitTrip">Modifica attività</button>
       </div>
     </div>
   </div>
@@ -103,7 +117,7 @@ import CmpDropFile from '../components/CmpDropFile.vue';
 export default {
   components: { CmpDropFile },
   props: {
-    tripId: {
+    stageId: {
       type: String,
       required: true
     },
@@ -116,14 +130,15 @@ export default {
     return {
       store,
       validate,
-      name: 'Name ',
-      location: 'location',
-      startTime: '12:00',
-      endTime: '13:00',
+      name: ' ',
+      location: '',
+      startTime: '',
+      endTime: '',
       description: '',
       food: '',
       curiosities: '',
       imgFiles: [],
+      newImgFiles: [],
     }
   },
   methods: {
@@ -140,26 +155,32 @@ export default {
           "food",
           "curiosities"
         ])
-        outer.trip_id = this.tripId;
-        outer.date = this.date;
         outer.location = {
           address: outer.location,
           lat: 33065114516071,
           lon: 41528345635181,
         }
+        for (const key in this.stage.files) {
+          if (!this.imgFiles.includes(this.stage.files[key])) {
+            await this.stage.deleteFile(key)
+          }
+        }
 
-        let newStage = await this.store.stage.add(outer);
-        newStage = Object.values(newStage)[0]
-        await newStage.uploadFiles(this.imgFiles);
-        const trip = this.store.trip.all[newStage.trip_id]
-        trip.day[newStage.date] = { ...trip.day[newStage.date], ...{ [newStage.id]: newStage.id } };
-        await trip.update()
-        this.resetForm()
+        if (this.newImgFiles.length) {
+          await this.stage.uploadFiles(this.newImgFiles);
+        }
+        const stageUpdated = await this.store.stage.all[this.stageId].update(outer)
+        this.store.stage.all[this.stageId] = Object.values(stageUpdated)[0];
+
+        this.resetForm();
+        const id = this.stage.trip_id
         this.store.loading.off();
-        this.$router.push({ name: 'trip.show', params: { id: this.tripId } });
+        this.$router.push({ name: 'trip.show', params: { id } });
       } else {
         alert('Per favore, completa tutti i campi correttamente.');
       }
+
+
     },
 
     sendObj(arrVarName) {
@@ -178,6 +199,7 @@ export default {
       this.startTime = '';
       this.endTime = '';
       this.imgFiles = [];
+      this.newImgFiles = [];
       this.description = '';
       this.food = '';
       this.curiosities = '';
@@ -186,12 +208,50 @@ export default {
 
     getFileList(files) {
       for (const file of files) {
-        this.imgFiles.push(file)
+        this.newImgFiles.push(file)
+      }
+    }
+  },
+  computed: {
+    stage() {
+      if (this.store.trip.all && this.store.stage.all) {
+        return this.store.stage.all[this.stageId]
+      } else {
+        return false
+      }
+    }
+  },
+  watch: {
+    'stage'(newstage, oldstage) {
+      if (newstage !== oldstage && oldstage === false) {
+        if (newstage) {
+          this.name = this.stage.name;
+          this.location = this.stage.location.address;
+          this.startTime = this.stage.startTime;
+          this.endTime = this.stage.endTime;
+          this.imgFiles = Object.values(this.stage.files);
+          this.newImgFiles = [];
+          this.description = this.stage.description;
+          this.food = this.stage.food;
+          this.curiosities = this.stage.curiosities;
+          this.validate.init()
+        }
       }
     }
   },
   created() {
-    this.validate.init()
+    if (this.stage) {
+      this.name = this.stage.name;
+      this.location = this.stage.location.address;
+      this.startTime = this.stage.startTime;
+      this.endTime = this.stage.endTime;
+      this.imgFiles = Object.values(this.stage.files);
+      this.newImgFiles = [];
+      this.description = this.stage.description;
+      this.food = this.stage.food;
+      this.curiosities = this.stage.curiosities;
+      this.validate.init()
+    }
   }
 }
 </script>

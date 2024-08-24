@@ -21,14 +21,13 @@
       </div>
     </div>
     <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4">
-      <!-- <RouterLink :to="{ name: 'stage.create', params: { id, date: key } }" class="col p-2" -->
       <div class="col p-2" v-for="(day, key) in trip.day" :key="key">
         <div class="border rounded pt-3 position-relative">
           <span class="position-absolute top-0 start-0 translate-middle-y badge rounded bg-light text-orange-l">
             {{ key }}
           </span>
           <span class="position-absolute top-0 end-0 translate-middle-y">
-            <RouterLink :to="{ name: 'stage.create', params: { id, date: key } }" type="button"
+            <RouterLink :to="{ name: 'stage.create', params: { tripId: id, date: key } }" type="button"
               class="btn btn-outline-success p-1 rounded-circle border-0">
               <span class="material-symbols-outlined d-block">
                 add_circle
@@ -37,14 +36,14 @@
           </span>
           <template v-if="Object.keys(day).length > 0">
             <template v-if="store.stage.all">
-              <div v-for="(stage, stageid) in day" :key="stageid"
+              <div v-for="(stage, stageId) in day" :key="stageId"
                 class="border px-1 d-flex align-items-center m-1 p-1 rounded">
                 <p class="mb-0">
-                  <RouterLink :to="{ name: 'stage.show', params: { id, date: key, stageid } }">
-                    {{ store.stage.all[stageid].startTime }} | {{ store.stage.all[stageid].name }}
+                  <RouterLink :to="{ name: 'stage.show', params: { stageId, date: key } }">
+                    {{ store.stage.all[stageId].startTime }} | {{ store.stage.all[stageId].name }}
                   </RouterLink>
                 </p>
-                <span @click="deleteStage(stageid, store.stage.all[stageid].date)"
+                <span @click="store.stage.delete(stageId)"
                   class="btn btn-outline-danger border-0 ms-auto p-1 ">
                   <span class="material-symbols-outlined">
                     delete
@@ -111,19 +110,7 @@ export default {
       this.store.loading.off();
       this.$router.push({ name: 'home' })
     },
-    async deleteStage(id, date) {
-      this.store.loading.on();
-      const deleted = await this.store.stage.all[id].delete();
-      if (deleted) {
-        delete this.store.trip.all[this.id].day[date][deleted]
-        this.store.trip.all[this.id].update()
-        delete this.store.stage.all[deleted]
-        this.store.loading.off();
-      } else {
-        console.error('Errore delete item');
-        this.store.loading.off();
-      }
-    }
+
 
   },
   computed: {

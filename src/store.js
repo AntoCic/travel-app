@@ -13,7 +13,7 @@ export const store = reactive({
     async onLogin() {
         await this.trip.get()
         await this.stage.get()
-        this.loading.on("Altri 3s per vedere bene il bellissimo il loader");
+        this.loading.on("Altri 3s per vedere bene il bellissimo il loader ;)");
         setTimeout(() => {
             this.loading.off();
         }, 3000);
@@ -85,6 +85,20 @@ export const store = reactive({
                 return false
             }
         },
+        async delete(stageId) {
+            store.loading.on();
+            const tripId = this.all[stageId].trip_id;
+            const deleted = await this.all[stageId].delete();
+            if (deleted) {
+                delete store.trip.all[tripId].day[this.all[stageId].date][deleted]
+                await store.trip.all[tripId].update()
+                delete this.all[deleted]
+                store.loading.off();
+            } else {
+                console.error('Errore delete item');
+                store.loading.off();
+            }
+        }
     },
 
     // this.store.loading.on();

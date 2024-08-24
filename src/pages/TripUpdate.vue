@@ -193,7 +193,7 @@ export default {
   },
   watch: {
     'trip'(newtrip, oldtrip) {
-      if (newtrip !== oldtrip) {
+      if (newtrip !== oldtrip && oldtrip === false) {
         if (newtrip) {
           this.title = this.trip.title;
           this.description = this.trip.description;

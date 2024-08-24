@@ -81,7 +81,7 @@
       </div>
 
       <div class="col-12">
-        <button class="btn btn-outline-success w-100" @click="onSubmitTrip">ADD TRIP</button>
+        <button class="btn btn-outline-success w-100" @click="onSubmitTrip">Aggiungi un viaggio</button>
       </div>
     </div>
   </div>
