@@ -18,14 +18,26 @@
           massimo di 100. </p>
       </div>
       <!-- location -->
-      <div class="col-12 mb-2">
-        <label for="location" class="form-label mb-0 ms-1">Location</label>
+      <div class="col-4 mb-2">
+        <label for="setCountry" class="form-label mb-0 ms-1">Country</label>
+        <select class="form-select" aria-label="Default select example" id:="setCountry" v-model="setCountry">
+          <option v-for="country in countrySet" :value="country.countryCode">{{ country.name }}</option>
+        </select>
+      </div>
+      <div class="col-8 mb-2">
+        <label for="location" class="form-label mb-0 ms-1"></label>
         <div class="input-google-icon">
           <label for="location" class="material-symbols-outlined icon">
             explore
           </label>
           <input type="text" :class="['form-control', validate.check({ location, type: 'string', query: [3, 100] })]"
-            id="location" v-model="location" placeholder="Scrivi il titolo">
+            id="location" v-model="location" placeholder="Scrivi il titolo" @input="loadSugetsion" list="suggestions">
+          </input>
+          <datalist id="suggestions">
+            <option v-for="suggestion in suggestions" :key="suggestion.id" :value="suggestion.address">
+              {{ suggestion.address }}
+            </option>
+          </datalist>
         </div>
         <p :class="validate.showError('location')"> Il campo deve contenere un minimo di 3 caratteri e un
           massimo di 100. </p>
@@ -110,6 +122,7 @@
 
 <script>
 import { store } from '../store.js'
+import { countrySet } from '../personal_modules/countrySet.js';
 import validate from '../personal_modules/validate.js';
 
 import CmpDropFile from '../components/CmpDropFile.vue';
@@ -130,6 +143,7 @@ export default {
     return {
       store,
       validate,
+      countrySet,
       name: ' ',
       location: '',
       startTime: '',
@@ -139,6 +153,8 @@ export default {
       curiosities: '',
       imgFiles: [],
       newImgFiles: [],
+      setCountry: 'IT',
+      suggestions: [],
     }
   },
   methods: {
@@ -155,11 +171,7 @@ export default {
           "food",
           "curiosities"
         ])
-        outer.location = {
-          address: outer.location,
-          lat: 33065114516071,
-          lon: 41528345635181,
-        }
+        outer.location = await store.location.getLocation(outer.location);
         for (const key in this.stage.files) {
           if (!this.imgFiles.includes(this.stage.files[key])) {
             await this.stage.deleteFile(key)
@@ -203,6 +215,7 @@ export default {
       this.description = '';
       this.food = '';
       this.curiosities = '';
+      this.suggestions = [];
       this.validate.init()
     },
 

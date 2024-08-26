@@ -43,8 +43,7 @@
                     {{ store.stage.all[stageId].startTime }} | {{ store.stage.all[stageId].name }}
                   </RouterLink>
                 </p>
-                <span @click="store.stage.delete(stageId)"
-                  class="btn btn-outline-danger border-0 ms-auto p-1 ">
+                <span @click="store.stage.delete(stageId)" class="btn btn-outline-danger border-0 ms-auto p-1 ">
                   <span class="material-symbols-outlined">
                     delete
                   </span>
@@ -56,6 +55,11 @@
           <p v-else class="mb-0">Ancora nessuna attivita per {{ key }}</p>
 
         </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-12">
+        <div v-if="existStage" id="map" style="width: 100%; height: 50vw;"></div>
       </div>
     </div>
     <div class="row">
@@ -73,6 +77,9 @@
 </template>
 
 <script>
+
+import tt from '@tomtom-international/web-sdk-maps';
+
 import { store } from '../store.js'
 import validate from '../personal_modules/validate.js';
 import overlay_1 from '../assets/img/overlay/overlay_1.svg';
@@ -111,7 +118,32 @@ export default {
       this.$router.push({ name: 'home' })
     },
 
+    initializeMap() {
+      if (this.store.stage.all) {
+        const markers = [];
+        const popupText = [];
+        let zoom = 10;
+        for (const date in this.trip.day) {
+          for (const stageId in this.trip.day[date]) {
+            const stage = this.store.stage.all[stageId]
+            markers.push({ lng: stage.location.lng, lat: stage.location.lat, })
+            popupText.push(stage.name)
+          }
+        }
 
+        const map = tt.map({
+          center: markers[0],
+          key: this.store.location.apikey,
+          container: 'map',
+          zoom,
+        });
+
+        for (let index = 0; index < markers.length; index++) {
+          new tt.Popup().setLngLat(markers[index]).setText(popupText[index]).addTo(map);
+        }
+
+      }
+    }
   },
   computed: {
     trip() {
@@ -120,10 +152,31 @@ export default {
       } else {
         return false
       }
+    },
+    existStage() {
+      if (this.store.trip.all) {
+        for (const date in this.store.trip.all[this.id].day) {
+          for (const stageId in this.store.trip.all[this.id].day[date]) {
+            return true
+          }
+        }
+      } else {
+        return false
+      }
     }
   },
   created() {
     this.validate.init()
+  },
+  mounted() {
+    if (document.getElementById('map')) {
+      this.initializeMap()
+    }
+  },
+  updated() {
+    if (document.getElementById('map')) {
+      this.initializeMap()
+    }
   }
 }
 </script>

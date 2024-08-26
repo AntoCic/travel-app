@@ -1,4 +1,5 @@
 import { reactive } from 'vue'
+import ttServices from '@tomtom-international/web-sdk-services';
 import axios from 'axios'
 import Trip from './models/Trip.js';
 import Stage from './models/Stage.js';
@@ -13,6 +14,7 @@ export const store = reactive({
     async onLogin() {
         await this.trip.get()
         await this.stage.get()
+        await this.location.getApikey()
         this.loading.on("Altri 3s per vedere bene il bellissimo il loader ;)");
         setTimeout(() => {
             this.loading.off();
@@ -27,11 +29,7 @@ export const store = reactive({
     tripTypes: {
         all: null,
         async get() {
-            return await axios.get('/api/g-public/tripTypes', {}, {
-                headers: {
-                    "Authorization": this.userJWT
-                }
-            }).then((res) => {
+            return await axios.get('/api/g-public/tripTypes').then((res) => {
                 if (res.data) {
                     this.all = res.data
                 }
@@ -99,6 +97,72 @@ export const store = reactive({
                 store.loading.off();
             }
         }
+    },
+
+    location: {
+        apikey: '',
+        countrySet: 'IT',
+        setCountry(countrySet) {
+            this.countrySet = countrySet
+        },
+        async getApikey() {
+            this.apikey = await axios.post('/api/tomtomapikey', {}, {
+                headers: {
+                    "Authorization": store.userJWT
+                }
+            }).then(async (res) => {
+                return res.data
+            }).catch((error) => {
+                console.error(error);
+                return '';
+            });
+        },
+        async getSuggestion(address, countrySet = this.countrySet) {
+            if (address.trim() === '') {
+                return [];
+            }
+            return await ttServices.services.fuzzySearch({
+                key: this.apikey,
+                query: address,
+                language: 'it-IT',
+                countrySet,
+                limit: 6
+            }).then((res) => {
+                const suggestion = res.results.map(result => ({
+                    id: result.id,
+                    address: result.address.freeformAddress
+                }));
+                return suggestion
+            }).catch((error) => {
+                console.error('Autocomplete error:', error);
+                return [];
+            });
+        },
+
+        async getLocation(address, countrySet = this.countrySet) {
+            if (address.trim() === '') return false;
+            return await ttServices.services.geocode({
+                key: this.apikey,
+                query: address,
+                countrySet,
+            }).then((res) => {
+                if (res.results && res.results.length > 0) {
+                    const location = {
+                        address: res.results[0].address.freeformAddress,
+                        lat: res.results[0].position.lat,
+                        lng: res.results[0].position.lng,
+                    }
+                    return location;
+                } else {
+                    console.error('Indirizzo non trovato. Riprova.');
+                    return false;
+                }
+            }).catch((error) => {
+                console.error('Errore nella geocodifica:', error);
+                return false;
+            });
+        },
+
     },
 
     // this.store.loading.on();

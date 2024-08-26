@@ -11,7 +11,6 @@
     <AppFooter />
   </template>
   <p v-else>.</p>
-
 </template>
 
 <script>
@@ -34,6 +33,7 @@ export default {
     'user.accessToken'(newLog, oldLog) {
       if (newLog !== oldLog) {
         this.store.userJWT = newLog
+
         if (newLog) {
           this.store.onLogin()
         } else {

@@ -25,10 +25,6 @@ import admin from 'firebase-admin';
 
 exports.handler = async function (event, context) {
   await router.start(event);
-  // for (let index = 1; index < 20; index++) {
-  //   console.log(`"files":{"${firebase.newId()}":"tripTypes/${index}.png"}`);
-
-  // }
 
   await router.GET('g-public', async () => {
     const res = await firebase.public.get(router.pathParams);
@@ -40,6 +36,10 @@ exports.handler = async function (event, context) {
   if (router.authToken) {
     const user = await firebase.user.logged(router.authToken);
     if (user) {
+      await router.POST('tomtomapikey', async () => {
+        router.setRes(process.env.TT_APIKEY);
+      })
+
       await router.POST('g', async () => {
         const res = await firebase.user.get(router.pathParams);
 

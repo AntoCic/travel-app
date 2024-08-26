@@ -1,7 +1,7 @@
 <template>
   <div class="container" v-if="stage">
     <div class="row">
-      <div class="col-12 col-md-8 col-lg-6 mx-auto" v-if="stage.files">
+      <div class="col-12 col-md-8 col-lg-6 mx-auto" v-if="Object.keys(stage.files).length">
         <div id="carouselExampleCaptions" class="carousel slide" data-bs-ride="carousel">
           <div class="carousel-indicators">
             <button v-for="(image, key, i) in stage.files" :key="key + '-btn'" type="button"
@@ -42,10 +42,25 @@
         <p class="mb-0">{{ stage.startTime }} / {{ stage.endTime }}</p>
       </div>
       <div class="col-12">
-        <p>description : {{ stage.description }}</p>
-        <p>food : {{ stage.food }}</p>
-        <p>curiosities : {{ stage.curiosities }}</p>
-        <p>rating : {{ stage.rating ?? 0 }}</p>
+        <p v-if="stage.description">description : {{ stage.description }}</p>
+        <p v-if="stage.food">food : {{ stage.food }}</p>
+        <p v-if="stage.curiosities">curiosities : {{ stage.curiosities }}</p>
+        <p>rating :
+          <span type="button" v-for="x in stage.rating" @click="updateRating(x)"
+            class="material-symbols-outlined g-icon-fill fs-2 align-top text-warning">
+            star_rate
+          </span>
+          <span type="button" v-for="x in (5 - stage.rating)" @click="updateRating(x + 5 - (5 - stage.rating))"
+            class="material-symbols-outlined fs-2 align-top text-secondary">
+            star_rate
+          </span>
+          
+        </p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-12">
+        <div id="mapp" style="width: 100%; height: 50vw;"></div>
       </div>
     </div>
     <div class="row">
@@ -63,6 +78,8 @@
 </template>
 
 <script>
+
+import tt from '@tomtom-international/web-sdk-maps';
 import { store } from '../store.js'
 import validate from '../personal_modules/validate.js';
 export default {
@@ -87,20 +104,47 @@ export default {
       const id = this.stage.trip_id
       await this.store.stage.delete(this.stageId)
       this.$router.push({ name: 'trip.show', params: { id } })
+    },
+    async updateRating(x) {
+      this.store.loading.on();
+      const newRateStage = Object.values(await this.store.stage.all[this.stageId].update({ rating: x }))[0].rating
+      this.store.loading.off();
+      this.store.stage.all[this.stageId].rating = newRateStage
+    },
+    initializeMap() {
+      if (this.store.stage.all) {
+        const position = { lng: this.stage.location.lng, lat: this.stage.location.lat }
+        const map = tt.map({
+          center: position,
+          key: this.store.location.apikey,
+          container: 'mapp',
+          zoom: 13,
+        });
+        new tt.Marker().setLngLat(position).addTo(map);
+      }
     }
 
   },
   computed: {
     stage() {
       if (this.store.trip.all && this.store.stage.all) {
+        this.store.stage.all[this.stageId].rating = this.store.stage.all[this.stageId].rating ?? 0
         return this.store.stage.all[this.stageId]
       } else {
         return false
       }
     }
   },
-  created() {
-    // this.validate.init()
+  mounted() {
+
+    if (document.getElementById('mapp')) {
+      this.initializeMap()
+    }
+  },
+  updated() {
+    if (document.getElementById('mapp') && !document.getElementById('mapp').firstChild) {
+      this.initializeMap()
+    }
   }
 }
 </script>
