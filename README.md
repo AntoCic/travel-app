@@ -1,9 +1,19 @@
 # TripCicRem
+### Il tuo compagno di viaggio ideale
 
+Sei alla ricerca di un modo semplice e intuitivo per organizzare i tuoi viaggi, tenere traccia dei tuoi ricordi e conservare le tue foto e le emozioni del momento? Sei nel posto giusto.
+
+Questo sito è stato creato utilizzando tecnologie all'avanguardia come **VUE**, **Vite**, **Bootstrap**, **SASS**, **Firebase SDK** e **TomTom SDK**. Ho sviluppato personalmente un template che **semplifica e rende sicuro lo scambio di dati** con il database in tempo reale di Firebase, facilitando la gestione dello storage e includendo una sezione dedicata per l'autenticazione e la registrazione tramite **Google** o con **email e password**.
+
+La gestione delle rotte è affidata a **Vue Router**, con miglioramenti che automatizzano i redirect, mentre un sistema di validazione integrato, basato su **Vue** e **Bootstrap**, consente di validare i form con poche righe di codice. Il backend è gestito da **Netlify Function Serverless**, che, grazie a oggetti predefiniti come `router` e `firebase`, permette di creare rapidamente chiamate personalizzate o automatiche al Realtime Database o allo storage.
+
+Inoltre, il sito offre la possibilità di visualizzare mappe dettagliate delle varie attività attraverso il **TomTom SDK**. Questo progetto non è solo uno strumento per organizzare e tenere traccia delle tue vacanze, ma è anche una piattaforma su cui sto migliorando le mie competenze con tutte le tecnologie citate e affinando le mie capacità logiche.
+
+### Template base
+https://github.com/AntoCic/TEMP_vue-bootstrap-firebase
+
+### palette colori
 https://coolors.co/083d77-ebebd3-f4d35e-ee964b-f95738
-
-
-# Template base Vue, Bootstrap, sass, firebase
 
 ### Guida per Iniziare con Firebase
 
