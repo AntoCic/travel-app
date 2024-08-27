@@ -1,3 +1,5 @@
+// Store Archivio per gestire le informazioni principali.
+
 import { reactive } from 'vue'
 import ttServices from '@tomtom-international/web-sdk-services';
 import axios from 'axios'

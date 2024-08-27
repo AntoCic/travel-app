@@ -15,6 +15,16 @@ https://github.com/AntoCic/TEMP_vue-bootstrap-firebase
 ### palette colori
 https://coolors.co/083d77-ebebd3-f4d35e-ee964b-f95738
 
+
+
+
+
+
+
+
+
+
+
 ### Guida per Iniziare con Firebase
 
 Questa guida ti aiuterà a configurare Firebase nel tuo progetto, includendo la creazione di un database in tempo reale, l'impostazione dell'autenticazione, e il recupero delle chiavi necessarie per l'integrazione.

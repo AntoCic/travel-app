@@ -30,6 +30,7 @@ export default {
     }
   },
   watch: {
+    // Watcher necessari per far funzionare il redirect.
     'user.accessToken'(newLog, oldLog) {
       if (newLog !== oldLog) {
         this.store.userJWT = newLog
@@ -49,6 +50,7 @@ export default {
     },
   },
   methods: {
+    // Controlla i nomi delle rotte importati da './router.js'
     checkRoute() {
       // se this.store.userJWT non é null o false l'utente é loggato
       // dunque se loggato this.store.userJWT sará considerato true
@@ -66,7 +68,6 @@ export default {
   async mounted() {
     await this.store.start()
     this.user.checkLogged()
-
   },
 }
 </script>

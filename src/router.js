@@ -1,8 +1,5 @@
 import { createWebHistory, createRouter } from 'vue-router'
 
-
-
-
 import HomeView from './pages/HomeView.vue'
 import ContactView from './pages/ContactView.vue'
 import UserView from './pages/UserView.vue'
@@ -43,7 +40,8 @@ const fullRoutes = {
 
 
 
-// funzione interna che crea l'Object routes che contiene gli array con i
+// funzione interna che crea l'Object routes che contiene gli array con i 
+// nomi delle rotte pe gestire i ridirect
 const routes = Object.keys(fullRoutes).reduce((acc, key) => {
   acc[key] = fullRoutes[key].map(route => route.name);
   return acc;

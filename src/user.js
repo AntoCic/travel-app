@@ -1,3 +1,11 @@
+// Script per la gestione dell'utente e l'interazione con Firebase.
+// Tramite vari metodi, permette di eseguire le classiche funzioni 
+// di autenticazione e registrazione (anche tramite Google Provider),
+//  reset della password e logout finale.
+
+// Da modificare nel caso sia necessario gestire altre informazioni utente
+//  tramite i metodi: getUserData e addUserData.
+
 import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup, signOut, onAuthStateChanged, sendPasswordResetEmail } from 'firebase/auth';
 import { reactive } from 'vue'
@@ -28,6 +36,7 @@ export const user = reactive({
     userName: null,
 
     checkLogged() {
+        // Metodo che si avvia ad ogni login
         onAuthStateChanged(auth, async (currentUser) => {
             if (currentUser) {
                 this.accessToken = currentUser.accessToken
@@ -35,9 +44,9 @@ export const user = reactive({
                 this.email = currentUser.email
 
                 if (this.userName) {
-                    await this.addUserName(this.userName)
+                    await this.addUserData(this.userName)
                 } else {
-                    this.userName = await this.getUserName()
+                    this.userName = await this.getUserData()
                 }
             } else {
                 this.reset();
@@ -45,7 +54,7 @@ export const user = reactive({
         });
     },
 
-    // Metodo per eseguire il login
+    // Metodo per eseguire il login tramite email e password
     async login(email, password) {
         try {
             await signInWithEmailAndPassword(auth, email, password);
@@ -66,7 +75,7 @@ export const user = reactive({
             return false
         }
     },
-    // Metodo per eseguire il register
+    // Metodo per eseguire il register tramite email e password
     async register(userName, email, password) {
         try {
             this.userName = userName
@@ -79,7 +88,7 @@ export const user = reactive({
             return false
         }
     },
-
+    // Metodo per eseguire il ripristino della password tramite email
     resetPassword(email) {
         if (email.trim() === '') {
             alert("Inserisci l'email per recuperare la password.");
@@ -94,8 +103,9 @@ export const user = reactive({
                 console.error("Errore di reset della password:", error);
             });
     },
-    // Metodo per eseguire il logout
-    async getUserName() {
+    // Metodo per ottenere i dati dell'utente 
+    // in questo caso userName
+    async getUserData() {
         return await axios.post('/api/g/userdata/userName', {}, {
             headers: {
                 "Authorization": this.accessToken
@@ -107,7 +117,7 @@ export const user = reactive({
                 } else {
                     const userName = prompt("Inserisci il Nome utenete").trim();
                     if (userName != null && userName != '') {
-                        return await this.addUserName(userName)
+                        return await this.addUserData(userName)
                     } else {
                         alert("Nome non settato correttamente");
                         return null
@@ -121,8 +131,9 @@ export const user = reactive({
 
 
     },
-    // Metodo per eseguire il logout
-    async addUserName(userName) {
+    // Metodo per aggiungere i dati dell'utente 
+    // in questo caso userName
+    async addUserData(userName) {
 
         const id = 'userName'
         const data = userName
@@ -154,13 +165,12 @@ export const user = reactive({
             console.error('Logout failed', error);
         }
     },
-    // Metodo per eseguire il logout
+    // Metodo per reset dei dati dell'utente
     reset() {
         this.accessToken = false
         this.uid = null
         this.email = null
         this.userName = null
-        // store.loading.off();
     },
 
 
